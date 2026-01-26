@@ -1,29 +1,75 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
+// use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\Route;
+// use App\Http\Controllers\Api\AuthController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+// Route::post('/login', [AuthController::class, 'login']);
+// Route::post('/register', [AuthController::class, 'register']);
 
 
 
 
 // Protected routes
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::post('/logout', [AuthController::class, 'logout']);
+
+
+//     // User profile route
+//     Route::get('/user', function (Request $request) {
+//         return $request->user();
+//     });
+
+
+// });
+
+
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Api\MasterAdminController;
+use App\Http\Controllers\Api\admasterController;
+
+
+// Public Routes
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+
+
+// Protected Routes
+
 Route::middleware('auth:sanctum')->group(function () {
+
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // logged-in user info
+    Route::get('/user', fn (Request $request) => $request->user());
 
-    // User profile route
-    Route::get('/user', function (Request $request) {
-        return $request->user();
+   
+   //aster Admin Routes
+    
+    Route::middleware('role:master_admin')->group(function () {
+        Route::get('/schools', [MasterAdminController::class, 'schools']);
+        Route::post('/schools', [MasterAdminController::class, 'createSchool']);
+        Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
+        Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
     });
 
-
+   
+   // admaster Routes
+    
+    Route::middleware('role:headmaster')->group(function () {
+        Route::get('/users', [HeadmasterController::class, 'users']);
+        Route::post('/users', [HeadmasterController::class, 'createUser']);
+        Route::put('/users/{user}', [HeadmasterController::class, 'updateUser']);
+        Route::delete('/users/{user}', [HeadmasterController::class, 'deleteUser']);
+    });
 });
+
 
