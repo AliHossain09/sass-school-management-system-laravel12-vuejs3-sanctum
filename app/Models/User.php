@@ -46,4 +46,35 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+    // Auth user belongs to a school
+    public function school()
+    {
+        return $this->belongsTo(School::class);
+    }
+
+    // Headmaster of a school
+    public function headedSchool()
+    {
+        return $this->hasOne(School::class, 'headmaster_id');
+    }
+
+    // If user is a student
+    public function student()
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    // If user is a teacher
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
+
+    // If user is a parent
+    public function parentProfile()
+    {
+        return $this->hasOne(ParentModel::class);
+    }
 }
