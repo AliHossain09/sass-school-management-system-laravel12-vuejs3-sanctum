@@ -1,33 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../Pages/Login.vue';
 import Register from '../Pages/Register.vue';
-import Dashboard from '../Pages/Dashboard.vue';
+import MasterDashboard from '../Pages/dashboard/MasterDashboard.vue';
+import HeadmasterDashboard from '../Pages/dashboard/HeadmasterDashboard.vue';
+import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
+import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
 import axios from 'axios';
 
-
-// Protect dashboard route
-const requireAuth = async (to, from, next) => {
-    try {
-        await axios.get('/api/user'); // call Laravel auth endpoint
-        next();
-    } catch (error) {
-        next('/login');
-    }
-};
-
+const requireAuth = (to, from, next) => {
+  const token = localStorage.getItem('token')
+  if (!token) return next('/login')
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+  next()
+}
 
 const routes = [
-    { path: '/', redirect: '/login' },
-    { path: '/login', component: Login },
-    { path: '/register', component: Register },
-    { path: '/dashboard', component: Dashboard, beforeEnter: requireAuth },
-];
+  { path: '/', redirect: '/login' },
+  { path: '/login', component: Login },
+  { path: '/register', component: Register },
 
+  { path: '/master-dashboard', component: MasterDashboard, beforeEnter: requireAuth },
+  { path: '/headmaster-dashboard', component: HeadmasterDashboard, beforeEnter: requireAuth },
+  { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
+  { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
+]
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
-});
+  history: createWebHistory(),
+  routes,
+})
 
-
-export default router; 
+export default router
