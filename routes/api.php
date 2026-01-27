@@ -27,61 +27,95 @@
 
 // });
 
+// ......................
+
+// use Illuminate\Http\Request;
+// use Illuminate\Support\Facades\Route;
+// use App\Http\Controllers\Api\AuthController;
+// use App\Http\Controllers\Api\MasterAdminController;
+// use App\Http\Controllers\Api\admasterController;
+
+
+// // Public Routes
+
+// Route::post('/login', [AuthController::class, 'login']);
+// Route::post('/register', [AuthController::class, 'register']);
+
+
+// // Protected Routes
+
+//  Route::middleware(['auth:sanctum'])->group(function () {
+
+//     Route::middleware('role:master_admin')->group(function () {
+//         Route::post('/schools', [MasterAdminController::class, 'createSchool']);
+//     });
+
+//     Route::middleware('role:headmaster')->group(function () {
+//         Route::post('/users', [HeadmasterController::class, 'createUser']);
+//     });
+
+
+
+// Route::middleware('auth:sanctum')->group(function () {
+
+//     Route::post('/logout', [AuthController::class, 'logout']);
+
+//     // logged-in user info
+//     Route::get('/user', fn (Request $request) => $request->user());
+
+   
+//    //aster Admin Routes
+    
+//     // Route::middleware('role:master_admin')->group(function () {
+//     //     Route::get('/schools', [MasterAdminController::class, 'schools']);
+//     //     Route::post('/schools', [MasterAdminController::class, 'createSchool']);
+//     //     Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
+//     //     Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
+//     // });
+
+   
+
+// });
+
+   
+//    // admaster Routes
+    
+//     Route::middleware('role:headmaster')->group(function () {
+//         Route::get('/users', [HeadmasterController::class, 'users']);
+//         Route::post('/users', [HeadmasterController::class, 'createUser']);
+//         Route::put('/users/{user}', [HeadmasterController::class, 'updateUser']);
+//         Route::delete('/users/{user}', [HeadmasterController::class, 'deleteUser']);
+//     });
+// });
+
+
+
 
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MasterAdminController;
-use App\Http\Controllers\Api\admasterController;
+use App\Http\Controllers\Api\HeadmasterController;
 
-
-// Public Routes
-
+// Public
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
-
-// Protected Routes
-
+// Protected
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
-
-    // logged-in user info
     Route::get('/user', fn (Request $request) => $request->user());
 
-   
-   //aster Admin Routes
-    
-    Route::middleware('role:master_admin')->group(function () {
-        Route::get('/schools', [MasterAdminController::class, 'schools']);
-        Route::post('/schools', [MasterAdminController::class, 'createSchool']);
-        Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
-        Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
-    });
-
-    Route::middleware(['auth:sanctum'])->group(function () {
-
+    // Master Admin
     Route::middleware('role:master_admin')->group(function () {
         Route::post('/schools', [MasterAdminController::class, 'createSchool']);
     });
 
+    // Headmaster
     Route::middleware('role:headmaster')->group(function () {
         Route::post('/users', [HeadmasterController::class, 'createUser']);
     });
-
 });
-
-   
-   // admaster Routes
-    
-    Route::middleware('role:headmaster')->group(function () {
-        Route::get('/users', [HeadmasterController::class, 'users']);
-        Route::post('/users', [HeadmasterController::class, 'createUser']);
-        Route::put('/users/{user}', [HeadmasterController::class, 'updateUser']);
-        Route::delete('/users/{user}', [HeadmasterController::class, 'deleteUser']);
-    });
-});
-
 
