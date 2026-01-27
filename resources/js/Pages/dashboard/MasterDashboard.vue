@@ -45,7 +45,7 @@ const createSchool = async () => {
   try {
     loading.value = true
     await axios.post('/api/schools', form.value, { headers: authHeader() })
-    alert('School created successfully ✅')
+    alert('School created successfully')
     openForm()
     loadSchools()
   } catch (e: any) {

@@ -11,6 +11,7 @@ class MasterAdminController extends Controller
 {
      public function createSchool(Request $request)
     {
+        // dd('hit');
      $request->validate([
         'name' => 'required',
         'password' => 'required|min:6',
@@ -21,7 +22,7 @@ class MasterAdminController extends Controller
     //  Create school FIRST (without headmaster)
     $school = School::create([
         'name' => $request->name,
-        'password' => bcrypt($request->password),
+        // 'password' => bcrypt($request->password),
         'address' => $request->address,
     ]);
 

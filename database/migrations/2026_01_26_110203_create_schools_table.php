@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('address')->nullable();
-            $table->foreignId('headmaster_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('headmaster_id')->nullable();
             $table->timestamps();
-            });
+        });
     }
 
     /**

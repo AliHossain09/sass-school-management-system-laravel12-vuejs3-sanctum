@@ -32,7 +32,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\Api\MasterAdminController;
+use App\Http\Controllers\Api\MasterAdminController;
 use App\Http\Controllers\Api\admasterController;
 
 
@@ -60,6 +60,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
         Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
     });
+
+    Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::middleware('role:master_admin')->group(function () {
+        Route::post('/schools', [MasterAdminController::class, 'createSchool']);
+    });
+
+    Route::middleware('role:headmaster')->group(function () {
+        Route::post('/users', [HeadmasterController::class, 'createUser']);
+    });
+
+});
 
    
    // admaster Routes
