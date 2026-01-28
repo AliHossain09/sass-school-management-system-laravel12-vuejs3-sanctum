@@ -26,7 +26,7 @@ const logout = () => {
 
   <!-- Sidebar -->
   <aside
-    class="bg-slate-900 text-white w-64 p-4 flex flex-col justify-start xl-justify-between
+    class="bg-slate-900 text-white w-64 p-4 flex flex-col justify-start xl:justify-between
            fixed xl:static z-50 h-screen transition-transform duration-300"
     :class="{
       '-translate-x-full xl:translate-x-0': !isOpen,
