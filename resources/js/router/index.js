@@ -5,6 +5,7 @@ import MasterDashboard from '../Pages/dashboard/MasterDashboard.vue';
 import HeadmasterDashboard from '../Pages/dashboard/HeadmasterDashboard.vue';
 import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
+import ManageSchools from '../components/MasterAdminMenu/ManageSchools.vue';
 import axios from 'axios';
 
 const requireAuth = (to, from, next) => {
@@ -23,6 +24,8 @@ const routes = [
   { path: '/headmaster-dashboard', component: HeadmasterDashboard, beforeEnter: requireAuth },
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
+  { path: '/manage-schools', component: ManageSchools, beforeEnter: requireAuth },
+
 ]
 
 const router = createRouter({

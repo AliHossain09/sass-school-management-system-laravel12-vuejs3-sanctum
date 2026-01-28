@@ -1,5 +1,12 @@
 <script setup>
 import { useRouter } from 'vue-router'
+
+const props = defineProps({
+  isOpen: Boolean
+})
+
+const emit = defineEmits(['close'])
+
 const router = useRouter()
 
 const logout = () => {
@@ -8,14 +15,39 @@ const logout = () => {
 }
 </script>
 
+
 <template>
-  <aside class="bg-slate-900 text-white w-64 p-4 flex flex-col justify-between">
+  <!-- Overlay (mobile only) -->
+  <div
+    v-if="isOpen"
+    class="fixed inset-0 bg-black/40 z-40 xl:hidden"
+    @click="$emit('close')"
+  ></div>
+
+  <!-- Sidebar -->
+  <aside
+    class="bg-slate-900 text-white w-64 p-4 flex flex-col justify-start xl-justify-between
+           fixed xl:static z-50 h-screen transition-transform duration-300"
+    :class="{
+      '-translate-x-full xl:translate-x-0': !isOpen,
+      'translate-x-0': isOpen
+    }"
+  >
+    <!-- Close button (mobile only) -->
+    <button
+      class="xl:hidden text-right text-xl mb-4"
+      @click="$emit('close')"
+    >
+      ✕
+    </button>
+
     <!-- MENU -->
     <nav class="flex flex-col gap-2">
       <router-link
         to="/master-dashboard"
         class="px-3 py-2 rounded hover:bg-indigo-700"
         active-class="bg-indigo-600"
+        @click="$emit('close')"
       >
         Dashboard
       </router-link>
@@ -24,6 +56,7 @@ const logout = () => {
         to="/manage-schools"
         class="px-3 py-2 rounded hover:bg-indigo-700"
         active-class="bg-indigo-600"
+        @click="$emit('close')"
       >
         Manage Schools
       </router-link>
