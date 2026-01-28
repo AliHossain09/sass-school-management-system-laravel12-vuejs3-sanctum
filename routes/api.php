@@ -58,26 +58,6 @@
 
 // Route::middleware('auth:sanctum')->group(function () {
 
-//     Route::post('/logout', [AuthController::class, 'logout']);
-
-//     // logged-in user info
-//     Route::get('/user', fn (Request $request) => $request->user());
-
-   
-//    //aster Admin Routes
-    
-//     // Route::middleware('role:master_admin')->group(function () {
-//     //     Route::get('/schools', [MasterAdminController::class, 'schools']);
-//     //     Route::post('/schools', [MasterAdminController::class, 'createSchool']);
-//     //     Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
-//     //     Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
-//     // });
-
-   
-
-// });
-
-   
 //    // admaster Routes
     
 //     Route::middleware('role:headmaster')->group(function () {
@@ -113,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/schools', [MasterAdminController::class, 'schools']);
         Route::post('/schools', [MasterAdminController::class, 'createSchool']);
         Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
+        Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
     });
 
     // Headmaster

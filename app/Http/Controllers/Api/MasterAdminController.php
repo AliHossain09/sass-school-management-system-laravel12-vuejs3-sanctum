@@ -77,4 +77,18 @@ class MasterAdminController extends Controller
             'message' => 'School updated successfully',
         ]);
     }
+
+    // Delete School
+    public function deleteSchool(School $school)
+    {
+        // delete headmaster + all users of this school
+        User::where('school_id', $school->id)->delete();
+
+        $school->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'School deleted successfully'
+        ]);
+    }
 }
