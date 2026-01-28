@@ -110,6 +110,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Master Admin
     Route::middleware('role:master_admin')->group(function () {
+        Route::get('/schools', [MasterAdminController::class, 'schools']);
         Route::post('/schools', [MasterAdminController::class, 'createSchool']);
     });
 

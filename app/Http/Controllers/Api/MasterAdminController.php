@@ -9,6 +9,19 @@ use App\Models\School;
 
 class MasterAdminController extends Controller
 {
+    // List Schools
+    public function schools()
+    {
+        $schools = School::with('headmaster')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $schools
+        ]);
+    }
+
+
+
      public function createSchool(Request $request)
     {
         // dd('hit');
