@@ -12,7 +12,6 @@ const schools = ref<any[]>([])
 const editingSchool = ref<any | null>(null)
 const showPassword = ref(false)
 
-/* --- Helpers --- */
 const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`
 })
@@ -43,7 +42,6 @@ const createSchool = async () => {
     errors.value.general = 'All fields required'
     return
   }
-
   try {
     loading.value = true
     await axios.post('/api/schools', form.value, { headers: authHeader() })
@@ -69,7 +67,9 @@ const updateSchool = async () => {
       `/api/schools/${editingSchool.value.id}`,
       {
         name: editingSchool.value.name,
-        address: editingSchool.value.address
+        address: editingSchool.value.address,
+        email: editingSchool.value.headmaster.email
+        
       },
       { headers: authHeader() }
     )
@@ -90,134 +90,186 @@ const deleteSchool = async (id: number) => {
     alert('Failed to delete school')
   }
 }
+
+/* --- Load More (dummy function) --- */
+const loadMore = () => {
+  alert('Load more data')
+}
 </script>
 
 <template>
   <AdminLayout>
-    <div>
-      <h1 class="text-3xl font-bold mb-4">Master Admin Dashboard</h1>
-      <p class="mb-6">Create schools from here</p>
+    <div class="p-6 bg-gray-50 rounded shadow">
 
-      <button
-        @click="openForm"
-        class="mb-6 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded"
-      >
-        ➕ Create School
-      </button>
-
-      <!-- Create Form -->
-      <div
-        v-if="activeRole === 'school'"
-        class="max-w-md bg-white p-6 rounded shadow mb-8"
-      >
-        <h3 class="text-xl font-semibold mb-4">Create School</h3>
-
-        <div v-if="errors.general" class="text-red-600 mb-2">
-          {{ errors.general }}
+      <!-- Header + Create Button aligned left and right -->
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 class="text-2xl font-bold mb-1">Master Admin Dashboard</h1>
+          <p class="text-gray-700">Create schools from here</p>
         </div>
-
-        <input
-          v-model="form.name"
-          placeholder="School Name"
-          class="w-full border px-3 py-2 mb-3 rounded"
-        />
-
-        <!-- Password with Show / Hide -->
-        <div class="relative mb-3">
-          <input
-            v-model="form.password"
-            :type="showPassword ? 'text' : 'password'"
-            placeholder="Password"
-            class="w-full border px-3 py-2 rounded pr-12"
-          />
-          <button
-            type="button"
-            @click="showPassword = !showPassword"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600"
-          >
-            {{ showPassword ? 'Hide' : 'Show' }}
-          </button>
-        </div>
-
-        <textarea
-          v-model="form.address"
-          placeholder="Address"
-          class="w-full border px-3 py-2 mb-4 rounded"
-        ></textarea>
-
         <button
-          @click="createSchool"
-          class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded"
+          @click="openForm"
+          class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 flex items-center gap-2"
         >
-          {{ loading ? 'Creating...' : 'Create' }}
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create School
         </button>
       </div>
 
-      <!-- School List -->
-      <h2 class="text-2xl font-semibold mb-3">All Schools</h2>
+      <!-- Table container -->
+      <div class="overflow-x-auto rounded-lg bg-white shadow">
+        <table class="min-w-full table-auto text-left">
+          <thead class="bg-blue-200 text-blue-700">
+            <tr>
+              <th class="px-4 py-2 font-semibold">SL.</th>
+              <th class="px-4 py-2 font-semibold">Name</th>
+              <th class="px-4 py-2 font-semibold">Address</th>
+              <th class="px-4 py-2 font-semibold">Headmaster</th>
+              <th class="px-4 py-2 font-semibold">Login Info</th>
+              <th class="px-4 py-2 font-semibold text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(school, index) in schools"
+              :key="school.id"
+              class="border-b last:border-b-0 hover:bg-gray-50"
+            >
+              <td class="px-4 py-3 font-mono text-blue-600 font-semibold">{{ String(index + 1).padStart(5, '0') }}</td>
+              <td class="px-4 py-3 font-semibold text-gray-700">{{ school.name }}</td>
+              <td class="px-4 py-3">{{ school.address }}</td>
+              <td class="px-4 py-3">{{ school.headmaster?.name || 'N/A' }}</td>
+              <td class="px-4 py-3">{{ school.headmaster?.email || 'N/A' }}</td>
+              <td class="px-4 py-3 flex justify-center gap-2">
+                <button
+                  @click="startEdit(school)"
+                  class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="deleteSchool(school.id)"
+                  class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            <tr v-if="schools.length === 0">
+              <td colspan="6" class="text-center py-4 text-gray-500">No schools found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <table class="w-full bg-white border rounded shadow">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="border p-2">Name</th>
-            <th class="border p-2">Address</th>
-            <th class="border p-2">Headmaster</th>
-            <th class="border p-2">Login Info</th>
-            <th class="border p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="s in schools" :key="s.id">
-            <td class="border p-2">{{ s.name }}</td>
-            <td class="border p-2">{{ s.address }}</td>
-            <td class="border p-2">{{ s.headmaster?.name }}</td>
-            <td class="border p-2">{{ s.headmaster?.email || 'N/A' }}</td>
-            <td class="border p-2 flex gap-2">
-              <button
-                @click="startEdit(s)"
-                class="bg-blue-600 text-white px-3 py-1 rounded text-sm"
-              >
-                Edit
-              </button>
-              <button
-                @click="deleteSchool(s.id)"
-                class="bg-red-600 text-white px-3 py-1 rounded text-sm"
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Load More Button -->
+      <div class="flex justify-center mt-6">
+        <button
+          @click="loadMore"
+          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+        >
+          Load More
+        </button>
+      </div>
 
-      <!-- Edit Modal -->
+      <!-- Create/Edit Form Modal -->
       <div
-        v-if="editingSchool"
-        class="fixed inset-0 bg-black/40 flex items-center justify-center"
+        v-if="activeRole === 'school' || editingSchool"
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
       >
-        <div class="bg-white p-6 rounded w-96">
-          <h3 class="text-xl font-semibold mb-4">Edit School</h3>
+        <div class="bg-white rounded p-6 w-full max-w-md shadow-lg relative">
+          <button
+              @click="activeRole = null; editingSchool = null"
+              class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
+              &times;
+            </button>
+
+
+          <h3 class="text-xl font-semibold mb-4">
+            {{ activeRole === 'school' ? 'Create School' : 'Edit School' }}
+          </h3>
+
+          <div v-if="errors.general" class="text-red-600 mb-2">
+            {{ errors.general }}
+          </div>
 
           <input
-            v-model="editingSchool.name"
+            v-if="activeRole === 'school'"
+            v-model="form.name"
+            placeholder="School Name"
             class="w-full border px-3 py-2 mb-3 rounded"
           />
 
-          <textarea
-            v-model="editingSchool.address"
-            class="w-full border px-3 py-2 mb-4 rounded"
-          ></textarea>
+          <template v-if="activeRole === 'school'">
+            <div class="relative mb-3">
+              <input
+                v-model="form.password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="Password"
+                class="w-full border px-3 py-2 rounded pr-12"
+              />
+              <button
+                type="button"
+                @click="showPassword = !showPassword"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600"
+              >
+                {{ showPassword ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+            <textarea
+              v-model="form.address"
+              placeholder="Address"
+              class="w-full border px-3 py-2 mb-4 rounded"
+            ></textarea>
+          </template>
+
+          <template v-if="editingSchool">
+            <textarea
+              v-model="editingSchool.name"
+              placeholder="Name"
+              class="w-full border px-3 py-2 mb-4 rounded"
+            ></textarea>
+          </template>
+
+          <template v-if="editingSchool">
+            <textarea
+              v-model="editingSchool.address"
+              placeholder="Address"
+              class="w-full border px-3 py-2 mb-4 rounded"
+            ></textarea>
+          </template>
+
+          <template v-if="editingSchool">
+            <textarea
+              v-model="editingSchool.headmaster.email"
+              placeholder="Email"
+              class="w-full border px-3 py-2 mb-4 rounded"
+            ></textarea>
+          </template>
 
           <div class="flex justify-end gap-2">
             <button
-              @click="editingSchool = null"
-              class="px-4 py-2 border rounded"
-            >
-              Cancel
-            </button>
+                @click="activeRole = null; editingSchool = null"
+                class="px-4 py-2 border rounded hover:bg-gray-100">
+                Cancel
+              </button>
+
+
             <button
+              v-if="activeRole === 'school'"
+              @click="createSchool"
+              :disabled="loading"
+              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-60"
+            >
+              {{ loading ? 'Creating...' : 'Create' }}
+            </button>
+
+            <button
+              v-if="editingSchool"
               @click="updateSchool"
-              class="bg-green-600 text-white px-4 py-2 rounded"
+              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
             >
               Update
             </button>

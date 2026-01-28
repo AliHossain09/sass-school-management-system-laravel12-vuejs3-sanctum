@@ -92,7 +92,7 @@ const logout = async () => {
       ></div>
 
       <!-- Main content area -->
-      <main class="flex-1 p-6 overflow-auto md:ml-64">
+      <main class="flex-1 p-6 overflow-auto">
         <slot />
       </main>
     </div>
