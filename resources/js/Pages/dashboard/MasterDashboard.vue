@@ -162,6 +162,7 @@ const deleteSchool = async (id: number) => {
             <th class="border p-2">Name</th>
             <th class="border p-2">Address</th>
             <th class="border p-2">Headmaster</th>
+            <th class="border p-2">Login Info</th>
             <th class="border p-2">Action</th>
           </tr>
         </thead>
@@ -170,6 +171,7 @@ const deleteSchool = async (id: number) => {
             <td class="border p-2">{{ s.name }}</td>
             <td class="border p-2">{{ s.address }}</td>
             <td class="border p-2">{{ s.headmaster?.name }}</td>
+            <td class="border p-2">{{ s.headmaster?.email || 'N/A' }}</td>
             <td class="border p-2 flex gap-2">
               <button
                 @click="startEdit(s)"
