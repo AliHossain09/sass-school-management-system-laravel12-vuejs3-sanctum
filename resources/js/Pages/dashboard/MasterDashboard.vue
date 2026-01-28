@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AdminLayout from '../../layouts/AdminLayout.vue'
+import MasterAdminLayout from '@/layouts/MasterAdminLayout.vue'
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
@@ -100,7 +100,7 @@ const deleteSchool = async (id: number) => {
 </script>
 
 <template>
-  <AdminLayout>
+  <MasterAdminLayout>
     <div class="p-6 bg-gray-50 rounded shadow">
 
       <!-- Header + Create Button -->
@@ -203,5 +203,5 @@ const deleteSchool = async (id: number) => {
         </div>
       </div>
     </div>
-  </AdminLayout>
+  </MasterAdminLayout>
 </template>
