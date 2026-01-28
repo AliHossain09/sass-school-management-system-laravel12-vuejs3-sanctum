@@ -9,6 +9,13 @@ const form = ref({ name: '', password: '', address: '' })
 const errors = ref<any>({})
 const loading = ref(false)
 const schools = ref<any[]>([])
+const meta = ref({
+  current_page: 1,
+  from: 0,
+  to: 0,
+  total: 0,
+  last_page: 0
+})
 const editingSchool = ref<any | null>(null)
 const showPassword = ref(false)
 
@@ -16,16 +23,17 @@ const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`
 })
 
-/* --- Load Schools --- */
-const loadSchools = async () => {
+/* --- Load Schools with pagination --- */
+const loadSchools = async (page = 1) => {
   try {
-    const res = await axios.get('/api/schools', { headers: authHeader() })
+    const res = await axios.get(`/api/schools?page=${page}`, { headers: authHeader() })
     schools.value = res.data.data
+    meta.value = res.data.meta
   } catch (e) {
     console.error('Failed to load schools', e)
   }
 }
-onMounted(loadSchools)
+onMounted(() => loadSchools())
 
 /* --- Open Form --- */
 const openForm = () => {
@@ -46,7 +54,7 @@ const createSchool = async () => {
     loading.value = true
     await axios.post('/api/schools', form.value, { headers: authHeader() })
     alert('School created successfully')
-    openForm()
+    activeRole.value = null
     loadSchools()
   } catch (e: any) {
     errors.value = e.response?.data?.errors || { general: 'Failed to create' }
@@ -69,12 +77,11 @@ const updateSchool = async () => {
         name: editingSchool.value.name,
         address: editingSchool.value.address,
         email: editingSchool.value.headmaster.email
-        
       },
       { headers: authHeader() }
     )
     editingSchool.value = null
-    loadSchools()
+    loadSchools(meta.value.current_page)
   } catch (e) {
     alert('Failed to update school')
   }
@@ -85,15 +92,10 @@ const deleteSchool = async (id: number) => {
   if (!confirm('Delete this school?')) return
   try {
     await axios.delete(`/api/schools/${id}`, { headers: authHeader() })
-    loadSchools()
+    loadSchools(meta.value.current_page)
   } catch (e) {
     alert('Failed to delete school')
   }
-}
-
-/* --- Load More (dummy function) --- */
-const loadMore = () => {
-  alert('Load more data')
 }
 </script>
 
@@ -101,7 +103,7 @@ const loadMore = () => {
   <AdminLayout>
     <div class="p-6 bg-gray-50 rounded shadow">
 
-      <!-- Header + Create Button aligned left and right -->
+      <!-- Header + Create Button -->
       <div class="flex justify-between items-center mb-6">
         <div>
           <h1 class="text-2xl font-bold mb-1">Master Admin Dashboard</h1>
@@ -118,7 +120,7 @@ const loadMore = () => {
         </button>
       </div>
 
-      <!-- Table container -->
+      <!-- Table -->
       <div class="overflow-x-auto rounded-lg bg-white shadow">
         <table class="min-w-full table-auto text-left">
           <thead class="bg-blue-200 text-blue-700">
@@ -132,29 +134,15 @@ const loadMore = () => {
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(school, index) in schools"
-              :key="school.id"
-              class="border-b last:border-b-0 hover:bg-gray-50"
-            >
-              <td class="px-4 py-3 font-mono text-blue-600 font-semibold">{{ String(index + 1).padStart(5, '0') }}</td>
+            <tr v-for="(school, index) in schools" :key="school.id" class="border-b last:border-b-0 hover:bg-gray-50">
+              <td class="px-4 py-3 font-mono text-blue-600 font-semibold">{{ String(index + 1 + (meta.current_page-1)*meta.per_page).padStart(5,'0') }}</td>
               <td class="px-4 py-3 font-semibold text-gray-700">{{ school.name }}</td>
               <td class="px-4 py-3">{{ school.address }}</td>
               <td class="px-4 py-3">{{ school.headmaster?.name || 'N/A' }}</td>
               <td class="px-4 py-3">{{ school.headmaster?.email || 'N/A' }}</td>
               <td class="px-4 py-3 flex justify-center gap-2">
-                <button
-                  @click="startEdit(school)"
-                  class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-                >
-                  Edit
-                </button>
-                <button
-                  @click="deleteSchool(school.id)"
-                  class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                >
-                  Delete
-                </button>
+                <button @click="startEdit(school)" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
+                <button @click="deleteSchool(school.id)" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
               </td>
             </tr>
             <tr v-if="schools.length === 0">
@@ -164,115 +152,53 @@ const loadMore = () => {
         </table>
       </div>
 
-      <!-- Load More Button -->
-      <div class="flex justify-center mt-6">
-        <button
-          @click="loadMore"
-          class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-        >
-          Load More
-        </button>
+      <!-- Pagination -->
+      <div class="flex justify-between items-center mt-4">
+        <!-- Left side: showing entries -->
+        <div class="text-gray-600">
+          Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} entries
+        </div>
+
+        <!-- Right side: page numbers -->
+        <div class="flex gap-1">
+          <button :disabled="meta.current_page===1" @click="loadSchools(meta.current_page-1)" class="px-2 py-1 border rounded disabled:opacity-50">&laquo;</button>
+
+          <button v-for="page in meta.last_page" :key="page" @click="loadSchools(page)" :class="['px-2 py-1 border rounded', page===meta.current_page ? 'bg-blue-600 text-white' : '']">
+            {{ page }}
+          </button>
+
+          <button :disabled="meta.current_page===meta.last_page" @click="loadSchools(meta.current_page+1)" class="px-2 py-1 border rounded disabled:opacity-50">&raquo;</button>
+        </div>
       </div>
 
       <!-- Create/Edit Form Modal -->
-      <div
-        v-if="activeRole === 'school' || editingSchool"
-        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-      >
+      <div v-if="activeRole==='school' || editingSchool" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
         <div class="bg-white rounded p-6 w-full max-w-md shadow-lg relative">
-          <button
-              @click="activeRole = null; editingSchool = null"
-              class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
-              &times;
-            </button>
+          <button @click="activeRole=null; editingSchool=null" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
 
+          <h3 class="text-xl font-semibold mb-4">{{ activeRole==='school' ? 'Create School' : 'Edit School' }}</h3>
 
-          <h3 class="text-xl font-semibold mb-4">
-            {{ activeRole === 'school' ? 'Create School' : 'Edit School' }}
-          </h3>
+          <div v-if="errors.general" class="text-red-600 mb-2">{{ errors.general }}</div>
 
-          <div v-if="errors.general" class="text-red-600 mb-2">
-            {{ errors.general }}
-          </div>
-
-          <input
-            v-if="activeRole === 'school'"
-            v-model="form.name"
-            placeholder="School Name"
-            class="w-full border px-3 py-2 mb-3 rounded"
-          />
-
-          <template v-if="activeRole === 'school'">
+          <input v-if="activeRole==='school'" v-model="form.name" placeholder="School Name" class="w-full border px-3 py-2 mb-3 rounded"/>
+          <template v-if="activeRole==='school'">
             <div class="relative mb-3">
-              <input
-                v-model="form.password"
-                :type="showPassword ? 'text' : 'password'"
-                placeholder="Password"
-                class="w-full border px-3 py-2 rounded pr-12"
-              />
-              <button
-                type="button"
-                @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600"
-              >
-                {{ showPassword ? 'Hide' : 'Show' }}
-              </button>
+              <input v-model="form.password" :type="showPassword?'text':'password'" placeholder="Password" class="w-full border px-3 py-2 rounded pr-12"/>
+              <button type="button" @click="showPassword=!showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-600">{{ showPassword?'Hide':'Show' }}</button>
             </div>
-            <textarea
-              v-model="form.address"
-              placeholder="Address"
-              class="w-full border px-3 py-2 mb-4 rounded"
-            ></textarea>
+            <textarea v-model="form.address" placeholder="Address" class="w-full border px-3 py-2 mb-4 rounded"></textarea>
           </template>
 
           <template v-if="editingSchool">
-            <textarea
-              v-model="editingSchool.name"
-              placeholder="Name"
-              class="w-full border px-3 py-2 mb-4 rounded"
-            ></textarea>
-          </template>
-
-          <template v-if="editingSchool">
-            <textarea
-              v-model="editingSchool.address"
-              placeholder="Address"
-              class="w-full border px-3 py-2 mb-4 rounded"
-            ></textarea>
-          </template>
-
-          <template v-if="editingSchool">
-            <textarea
-              v-model="editingSchool.headmaster.email"
-              placeholder="Email"
-              class="w-full border px-3 py-2 mb-4 rounded"
-            ></textarea>
+            <textarea v-model="editingSchool.name" placeholder="Name" class="w-full border px-3 py-2 mb-4 rounded"></textarea>
+            <textarea v-model="editingSchool.address" placeholder="Address" class="w-full border px-3 py-2 mb-4 rounded"></textarea>
+            <textarea v-model="editingSchool.headmaster.email" placeholder="Email" class="w-full border px-3 py-2 mb-4 rounded"></textarea>
           </template>
 
           <div class="flex justify-end gap-2">
-            <button
-                @click="activeRole = null; editingSchool = null"
-                class="px-4 py-2 border rounded hover:bg-gray-100">
-                Cancel
-              </button>
-
-
-            <button
-              v-if="activeRole === 'school'"
-              @click="createSchool"
-              :disabled="loading"
-              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-60"
-            >
-              {{ loading ? 'Creating...' : 'Create' }}
-            </button>
-
-            <button
-              v-if="editingSchool"
-              @click="updateSchool"
-              class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Update
-            </button>
+            <button @click="activeRole=null; editingSchool=null" class="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
+            <button v-if="activeRole==='school'" @click="createSchool" :disabled="loading" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-60">{{ loading?'Creating...':'Create' }}</button>
+            <button v-if="editingSchool" @click="updateSchool" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Update</button>
           </div>
         </div>
       </div>

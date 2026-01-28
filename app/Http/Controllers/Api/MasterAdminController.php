@@ -10,15 +10,25 @@ use Illuminate\Http\Request;
 class MasterAdminController extends Controller
 {
     // List Schools
-    public function schools()
+        public function schools(Request $request)
     {
-        $schools = School::with('headmaster')->get();
+        $perPage = $request->get('per_page', 10); // optional, default 10
+        $schools = School::with('headmaster')->paginate($perPage);
 
         return response()->json([
             'success' => true,
-            'data' => $schools,
+            'data' => $schools->items(),
+            'meta' => [
+                'current_page' => $schools->currentPage(),
+                'from' => $schools->firstItem(),
+                'to' => $schools->lastItem(),
+                'per_page' => $schools->perPage(),
+                'total' => $schools->total(),
+                'last_page' => $schools->lastPage()
+            ]
         ]);
     }
+
 
     public function createSchool(Request $request)
     {
