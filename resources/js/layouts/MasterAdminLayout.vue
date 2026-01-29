@@ -1,5 +1,5 @@
 <script setup>
-import MasterSidebar from '@/components/sidebar/MasterSidebar.vue'
+import MasterSidebar from '../components/sidebar/MasterSidebar.vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -16,17 +16,17 @@ const logout = () => {
 <template>
   <div class="min-h-screen flex flex-col">
     <!-- NAVBAR -->
-    <header class="bg-white shadow flex items-center justify-between px-6 py-3">
+    <header class="bg-blue-900 shadow flex items-center justify-between px-6 py-3">
       <div class="flex items-center gap-3">
-        <!-- 🍔 Burger menu (only small screen) -->
+        <!--  Burger menu (only small screen) -->
         <button
-          class="xl:hidden text-2xl"
+          class="xl:hidden text-2xl text-white"
           @click="isSidebarOpen = true"
         >
           ☰
         </button>
 
-        <h1 class="font-bold text-lg">Master Admin</h1>
+        <h1 class="font-bold text-lg text-white">Master Admin</h1>
       </div>
 
       <button

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MasterAdminLayout from '@/layouts/MasterAdminLayout.vue'
+import MasterAdminLayout from '../../layouts/MasterAdminLayout.vue'
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
