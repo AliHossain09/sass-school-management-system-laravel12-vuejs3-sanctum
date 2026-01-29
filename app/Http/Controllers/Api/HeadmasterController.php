@@ -10,6 +10,30 @@ use Illuminate\Support\Facades\Storage;
 
 class HeadmasterController extends Controller
 {
+    public function indexTeachers(Request $request)
+{
+    $perPage = $request->get('per_page', 10);
+
+    // Headmaster can only see teachers of their school
+    $teachers = Teacher::with('user', 'school')
+        ->where('school_id', auth()->user()->school_id)
+        ->paginate($perPage);
+
+    return response()->json([
+        'success' => true,
+        'data' => $teachers->items(),
+        'meta' => [
+            'current_page' => $teachers->currentPage(),
+            'from' => $teachers->firstItem(),
+            'to' => $teachers->lastItem(),
+            'per_page' => $teachers->perPage(),
+            'total' => $teachers->total(),
+            'last_page' => $teachers->lastPage(),
+        ]
+    ]);
+}
+
+
    public function storeTeacher(Request $request)
 {
     $request->validate([

@@ -101,6 +101,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users', [HeadmasterController::class, 'createUser']);
 
         Route::post('/teachers', [HeadmasterController::class, 'storeTeacher']);
+        Route::get('/teachers', [HeadmasterController::class, 'indexTeachers']);
     });
 });
 
