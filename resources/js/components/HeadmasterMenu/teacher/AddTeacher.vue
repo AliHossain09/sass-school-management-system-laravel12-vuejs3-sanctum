@@ -2,6 +2,9 @@
 import { reactive, ref } from 'vue'
 import axios from 'axios'
 import HeadmasterLayout from '../../../layouts/HeadmasterLayout.vue'
+import { useToast } from 'vue-toastification'
+
+const toast = useToast() // Initialize toast
 
 const loading = ref(false)
 const error = ref('')
@@ -52,7 +55,7 @@ const submit = async () => {
   error.value = ''
 
   if (!form.first_name || !form.last_name || !form.gender) {
-    error.value = 'First name, last name, and gender are required.'
+    toast.error('First name, last name, and gender are required.')
     return
   }
 
@@ -81,19 +84,21 @@ const submit = async () => {
     await axios.post('/api/teachers', data, {
       headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' }
     })
-    alert('Teacher created successfully!')
+    
+    toast.success('Teacher created successfully!') // Replace alert with toast
 
     // Reset form
     Object.keys(form).forEach(k => form[k] = (k === 'employment_type') ? 'full-time' : '')
     subjectsInput.value = ''
     photoPreview.value = null
   } catch (err) {
-    error.value = err.response?.data?.message || 'Failed to create teacher.'
+    toast.error(err.response?.data?.message || 'Failed to create teacher.') // Use toast for error
   } finally {
     loading.value = false
   }
 }
 </script>
+
 
 <template>
   <HeadmasterLayout>
