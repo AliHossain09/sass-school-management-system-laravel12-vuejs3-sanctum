@@ -2,6 +2,10 @@
 import MasterAdminLayout from '../../layouts/MasterAdminLayout.vue'
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useToast } from 'vue-toastification'
+import Swal from 'sweetalert2'
+
+const toast = useToast() // Initialize toast
 
 /* --- State --- */
 const activeRole = ref<'school' | null>(null)
@@ -31,6 +35,7 @@ const loadSchools = async (page = 1) => {
     meta.value = res.data.meta
   } catch (e) {
     console.error('Failed to load schools', e)
+    toast.error('Failed to load schools')
   }
 }
 onMounted(() => loadSchools())
@@ -48,16 +53,18 @@ const createSchool = async () => {
   errors.value = {}
   if (!form.value.name || !form.value.password || !form.value.address) {
     errors.value.general = 'All fields required'
+    toast.error('All fields required')
     return
   }
   try {
     loading.value = true
     await axios.post('/api/schools', form.value, { headers: authHeader() })
-    alert('School created successfully')
+    toast.success('School created successfully')
     activeRole.value = null
     loadSchools()
   } catch (e: any) {
     errors.value = e.response?.data?.errors || { general: 'Failed to create' }
+    toast.error(errors.value.general || 'Failed to create school')
   } finally {
     loading.value = false
   }
@@ -68,6 +75,7 @@ const startEdit = (school: any) => {
   editingSchool.value = { ...school }
 }
 
+/* --- Update School --- */
 const updateSchool = async () => {
   if (!editingSchool.value) return
   try {
@@ -81,23 +89,38 @@ const updateSchool = async () => {
       { headers: authHeader() }
     )
     editingSchool.value = null
+    toast.success('School updated successfully')
     loadSchools(meta.value.current_page)
-  } catch (e) {
-    alert('Failed to update school')
+  } catch (e: any) {
+    toast.error('Failed to update school')
   }
 }
 
 /* --- Delete School --- */
 const deleteSchool = async (id: number) => {
-  if (!confirm('Delete this school?')) return
+  // SweetAlert2 confirm
+  const result = await Swal.fire({
+    title: 'Are you sure?',
+    text: "This action cannot be undone!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  })
+
+  if (!result.isConfirmed) return // User cancelled
+
   try {
     await axios.delete(`/api/schools/${id}`, { headers: authHeader() })
+    toast.success('School deleted successfully')
     loadSchools(meta.value.current_page)
-  } catch (e) {
-    alert('Failed to delete school')
+  } catch (e: any) {
+    toast.error('Failed to delete school')
   }
 }
 </script>
+
 
 <template>
   <MasterAdminLayout>
