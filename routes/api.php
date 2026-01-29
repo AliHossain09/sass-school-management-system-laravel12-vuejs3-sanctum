@@ -102,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::post('/teachers', [HeadmasterController::class, 'storeTeacher']);
         Route::get('/teachers', [HeadmasterController::class, 'indexTeachers']);
+        Route::post('/teachers/{teacher}', [HeadmasterController::class, 'updateTeacher']);
     });
 });
 

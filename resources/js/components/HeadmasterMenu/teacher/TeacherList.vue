@@ -4,7 +4,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 /* --- State --- */
-const teachers = ref < any[] > ([])
+const teachers = ref<any[]>([])
 const meta = ref({
     current_page: 1,
     from: 0,
@@ -14,9 +14,9 @@ const meta = ref({
 })
 const loading = ref(false)
 const error = ref('')
-const editingTeacher = ref < any | null > (null)
+const editingTeacher = ref<any | null>(null)
 const activeForm = ref(false)
-const form = ref < any > ({
+const form = ref<any>({
     first_name: '',
     last_name: '',
     gender: '',
@@ -116,9 +116,19 @@ const submit = async () => {
     try {
         loading.value = true
         if (editingTeacher.value) {
-            await axios.post(`/api/teachers/${editingTeacher.value.id}`, data, { headers: authHeader() })
+            await axios.post(`/api/teachers/${editingTeacher.value.id}`, data, {
+                headers: {
+                    ...authHeader(),
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
         } else {
-            await axios.post('/api/teachers', data, { headers: authHeader() })
+            await axios.post('/api/teachers', data, {
+                headers: {
+                    ...authHeader(),
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
         }
         activeForm.value = false
         loadTeachers(meta.value.current_page)
@@ -220,8 +230,9 @@ const deleteTeacher = async (id: number) => {
                         class="px-2 py-1 border rounded disabled:opacity-50">&laquo;</button>
                     <button v-for="page in meta.last_page" :key="page" @click="loadTeachers(page)"
                         :class="['px-2 py-1 border rounded', page === meta.current_page ? 'bg-blue-600 text-white' : '']">{{
-                        page }}</button>
-                    <button :disabled="meta.current_page === meta.last_page" @click="loadTeachers(meta.current_page + 1)"
+                            page }}</button>
+                    <button :disabled="meta.current_page === meta.last_page"
+                        @click="loadTeachers(meta.current_page + 1)"
                         class="px-2 py-1 border rounded disabled:opacity-50">&raquo;</button>
                 </div>
             </div>
