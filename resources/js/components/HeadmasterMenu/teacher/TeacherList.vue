@@ -149,14 +149,30 @@ const startEdit = (teacher: any) => {
 
 /* --- Delete Teacher --- */
 const deleteTeacher = async (id: number) => {
-    if (!confirm('Delete this teacher?')) return
+    if (!confirm('Are you sure you want to delete this teacher?')) return
+
     try {
-        await axios.delete(`/api/teachers/${id}`, { headers: authHeader() })
-        loadTeachers(meta.value.current_page)
+        loading.value = true
+
+        await axios.delete(`/api/teachers/${id}`, {
+            headers: authHeader()
+        })
+
+        // after delete if page empty
+        if (teachers.value.length === 1 && meta.value.current_page > 1) {
+            loadTeachers(meta.value.current_page - 1)
+        } else {
+            loadTeachers(meta.value.current_page)
+        }
+
     } catch (err) {
         alert('Failed to delete teacher')
+    } finally {
+        loading.value = false
     }
 }
+
+
 </script>
 
 <template>

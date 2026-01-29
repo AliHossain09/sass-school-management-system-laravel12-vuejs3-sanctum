@@ -152,4 +152,25 @@ class HeadmasterController extends Controller
             'message' => 'Teacher updated successfully',
         ]);
     }
+
+    public function destroyTeacher(Teacher $teacher)
+{
+    // Security: same school check (recommended)
+    if ($teacher->school_id !== auth()->user()->school_id) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    // Delete photo if exists
+    if ($teacher->photo && Storage::disk('public')->exists($teacher->photo)) {
+        Storage::disk('public')->delete($teacher->photo);
+    }
+
+    $teacher->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Teacher deleted successfully',
+    ]);
+}
+
 }

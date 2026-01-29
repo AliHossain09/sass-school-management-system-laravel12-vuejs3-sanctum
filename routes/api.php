@@ -98,11 +98,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Headmaster
     Route::middleware('role:headmaster')->group(function () {
-        Route::post('/users', [HeadmasterController::class, 'createUser']);
-
         Route::post('/teachers', [HeadmasterController::class, 'storeTeacher']);
         Route::get('/teachers', [HeadmasterController::class, 'indexTeachers']);
         Route::post('/teachers/{teacher}', [HeadmasterController::class, 'updateTeacher']);
+        Route::delete('/teachers/{teacher}', [HeadmasterController::class, 'destroyTeacher']);
+
     });
 });
 
