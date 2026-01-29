@@ -6,8 +6,9 @@ import HeadmasterDashboard from '../Pages/dashboard/HeadmasterDashboard.vue';
 import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
 import ManageSchools from '../components/MasterAdminMenu/ManageSchools.vue';
-import Teacher from '../components/HeadmasterMenu/Teacher.vue';
-import Student from '../components/HeadmasterMenu/Student.vue';
+import StudentAdmission from '../components/HeadmasterMenu/student/StudentAdmission.vue';
+import StudentList from '../components/HeadmasterMenu/student/StudentList.vue';
+import StudentAttendance from '../components/HeadmasterMenu/student/StudentAttendance.vue';
 import axios from 'axios';
 
 const requireAuth = (to, from, next) => {
@@ -26,9 +27,10 @@ const routes = [
   { path: '/headmaster-dashboard', component: HeadmasterDashboard, beforeEnter: requireAuth },
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
-  { path: '/manage-schools', component: ManageSchools, beforeEnter: requireAuth },
-  { path: '/manage-teachers', component: Teacher, beforeEnter: requireAuth },
-  { path: '/manage-students', component: Student, beforeEnter: requireAuth },
+  { path: '/manage-schools', component: ManageSchools, beforeEnter: requireAuth },,
+  { path: '/student-admission', component: StudentAdmission, beforeEnter: requireAuth },
+  { path: '/students-list', component: StudentList, beforeEnter: requireAuth },
+  { path: '/student-attendance', component: StudentAttendance, beforeEnter: requireAuth },
 
 ]
 
