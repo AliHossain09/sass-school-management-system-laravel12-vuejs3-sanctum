@@ -202,7 +202,7 @@ const deleteTeacher = async (id: number) => {
                     v-model="search"
                     type="text"
                     placeholder="Search by name, email or phone..."
-                    class="border border-blue-400 rounded px-4 py-2 w-64 focus:outline-none"
+                    class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none"
                 />
                 <button @click="openForm"
                     class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
