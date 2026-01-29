@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import HeadmasterLayout from '../../../layouts/HeadmasterLayout.vue'
 import { ref, onMounted, watch } from 'vue'
+import { useToast } from 'vue-toastification'
+import Swal from 'sweetalert2'
 import axios from 'axios'
+
+const toast = useToast()
 
 /* --- State --- */
 const teachers = ref<any[]>([])
@@ -115,7 +119,7 @@ const onPhotoChange = (e: Event) => {
 const submit = async () => {
     error.value = ''
     if (!form.value.first_name || !form.value.last_name || !form.value.gender) {
-        error.value = 'First name, last name, and gender are required.'
+        toast.error('First name, last name, and gender are required.')
         return
     }
 
@@ -134,12 +138,12 @@ const submit = async () => {
     try {
         loading.value = true
         if (editingTeacher.value) {
-            await axios.post(`/api/teachers/${editingTeacher.value.id}?_method=PUT`, data, {
-                headers: {
-                    ...authHeader(),
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
+            await axios.post(`/api/teachers/${editingTeacher.value.id}`, data, {
+    headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' },
+    params: { _method: 'PUT' }
+})
+
+            toast.success('Teacher updated successfully!')
         } else {
             await axios.post('/api/teachers', data, {
                 headers: {
@@ -147,11 +151,12 @@ const submit = async () => {
                     'Content-Type': 'multipart/form-data'
                 }
             })
+            toast.success('Teacher created successfully!')
         }
         activeForm.value = false
         loadTeachers(meta.value.current_page)
     } catch (err: any) {
-        error.value = err.response?.data?.message || 'Failed to save teacher'
+        toast.error(err.response?.data?.message || 'Failed to save teacher')
     } finally {
         loading.value = false
     }
@@ -167,24 +172,36 @@ const startEdit = (teacher: any) => {
 
 /* --- Delete Teacher --- */
 const deleteTeacher = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this teacher?')) return
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    })
+
+    if (!result.isConfirmed) return
 
     try {
         loading.value = true
         await axios.delete(`/api/teachers/${id}`, { headers: authHeader() })
+        toast.success('Teacher deleted successfully!')
 
         if (teachers.value.length === 1 && meta.value.current_page > 1) {
             loadTeachers(meta.value.current_page - 1)
         } else {
             loadTeachers(meta.value.current_page)
         }
-    } catch (err) {
-        alert('Failed to delete teacher')
+    } catch (err: any) {
+        toast.error(err.response?.data?.message || 'Failed to delete teacher')
     } finally {
         loading.value = false
     }
 }
 </script>
+
 
 <template>
     <HeadmasterLayout>

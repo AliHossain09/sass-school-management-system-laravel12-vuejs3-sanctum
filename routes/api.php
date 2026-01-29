@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:headmaster')->group(function () {
         Route::post('/teachers', [TeacherController::class, 'storeTeacher']);
         Route::get('/teachers', [TeacherController::class, 'indexTeachers']);
-        Route::post('/teachers/{teacher}', [TeacherController::class, 'updateTeacher']);
+        Route::put('/teachers/{teacher}', [TeacherController::class, 'updateTeacher']);
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroyTeacher']);
 
     });
