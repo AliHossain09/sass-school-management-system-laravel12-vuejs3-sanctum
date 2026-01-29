@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import HeadmasterLayout from '../../../layouts/HeadmasterLayout.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 
 /* --- State --- */
@@ -10,7 +10,8 @@ const meta = ref({
     from: 0,
     to: 0,
     total: 0,
-    last_page: 0
+    last_page: 0,
+    per_page: 10,
 })
 const loading = ref(false)
 const error = ref('')
@@ -39,6 +40,9 @@ const form = ref<any>({
 
 const subjectsInput = ref('')
 
+const search = ref('')
+let searchTimeout: any = null
+
 const authHeader = () => ({
     Authorization: `Bearer ${localStorage.getItem('token')}`
 })
@@ -47,7 +51,13 @@ const authHeader = () => ({
 const loadTeachers = async (page = 1) => {
     loading.value = true
     try {
-        const res = await axios.get(`/api/teachers?page=${page}`, { headers: authHeader() })
+        const res = await axios.get('/api/teachers', {
+            headers: authHeader(),
+            params: {
+                page,
+                search: search.value,
+            }
+        })
         teachers.value = res.data.data
         meta.value = res.data.meta
     } catch (err) {
@@ -57,6 +67,14 @@ const loadTeachers = async (page = 1) => {
     }
 }
 onMounted(() => loadTeachers())
+
+/* --- Watch search and debounce --- */
+watch(search, () => {
+    clearTimeout(searchTimeout)
+    searchTimeout = setTimeout(() => {
+        loadTeachers(1)
+    }, 400)
+})
 
 /* --- Open Create Form --- */
 const openForm = () => {
@@ -116,7 +134,7 @@ const submit = async () => {
     try {
         loading.value = true
         if (editingTeacher.value) {
-            await axios.post(`/api/teachers/${editingTeacher.value.id}`, data, {
+            await axios.post(`/api/teachers/${editingTeacher.value.id}?_method=PUT`, data, {
                 headers: {
                     ...authHeader(),
                     'Content-Type': 'multipart/form-data'
@@ -153,26 +171,19 @@ const deleteTeacher = async (id: number) => {
 
     try {
         loading.value = true
+        await axios.delete(`/api/teachers/${id}`, { headers: authHeader() })
 
-        await axios.delete(`/api/teachers/${id}`, {
-            headers: authHeader()
-        })
-
-        // after delete if page empty
         if (teachers.value.length === 1 && meta.value.current_page > 1) {
             loadTeachers(meta.value.current_page - 1)
         } else {
             loadTeachers(meta.value.current_page)
         }
-
     } catch (err) {
         alert('Failed to delete teacher')
     } finally {
         loading.value = false
     }
 }
-
-
 </script>
 
 <template>
@@ -187,6 +198,12 @@ const deleteTeacher = async (id: number) => {
 
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold mb-1">Teacher List</h1>
+                <input
+                    v-model="search"
+                    type="text"
+                    placeholder="Search by name, email or phone..."
+                    class="border border-blue-400 rounded px-4 py-2 w-64 focus:outline-none"
+                />
                 <button @click="openForm"
                     class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
                     Create Teacher
@@ -198,7 +215,7 @@ const deleteTeacher = async (id: number) => {
                     <thead class="bg-blue-200 text-blue-700">
                         <tr>
                             <th class="px-4 py-2">SL.</th>
-                            <th class="px-4 py-2">Photo</th> <!-- নতুন কলাম -->
+                            <th class="px-4 py-2">Photo</th>
                             <th class="px-4 py-2">Name</th>
                             <th class="px-4 py-2">Gender</th>
                             <th class="px-4 py-2">Class</th>
@@ -213,7 +230,6 @@ const deleteTeacher = async (id: number) => {
                             class="border-b last:border-b-0 hover:bg-gray-50">
                             <td class="px-4 py-3">{{ index + 1 + (meta.current_page - 1) * meta.per_page }}</td>
 
-                            <!-- Photo Column -->
                             <td class="px-4 py-3">
                                 <img v-if="teacher.photo" :src="`/storage/${teacher.photo}`" alt="Teacher Photo"
                                     class="h-12 w-12 object-cover rounded-full" />
@@ -238,7 +254,6 @@ const deleteTeacher = async (id: number) => {
                 </table>
             </div>
 
-            <!-- Pagination -->
             <div class="flex justify-between items-center mt-4">
                 <div class="text-gray-600">Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} entries</div>
                 <div class="flex gap-1">
@@ -246,9 +261,8 @@ const deleteTeacher = async (id: number) => {
                         class="px-2 py-1 border rounded disabled:opacity-50">&laquo;</button>
                     <button v-for="page in meta.last_page" :key="page" @click="loadTeachers(page)"
                         :class="['px-2 py-1 border rounded', page === meta.current_page ? 'bg-blue-600 text-white' : '']">{{
-                            page }}</button>
-                    <button :disabled="meta.current_page === meta.last_page"
-                        @click="loadTeachers(meta.current_page + 1)"
+                        page }}</button>
+                    <button :disabled="meta.current_page === meta.last_page" @click="loadTeachers(meta.current_page + 1)"
                         class="px-2 py-1 border rounded disabled:opacity-50">&raquo;</button>
                 </div>
             </div>
