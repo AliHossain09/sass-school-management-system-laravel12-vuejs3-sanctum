@@ -57,4 +57,16 @@ class Teacher extends Model
     {
         return $this->belongsTo(School::class);
     }
+
+    // Teacher teaches many subjects
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
+    }
+
+    // Teacher is class teacher of many sections
+    public function sections()
+    {
+        return $this->hasMany(Section::class);
+    }
 }

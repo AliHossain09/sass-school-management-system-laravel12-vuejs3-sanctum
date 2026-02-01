@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('parent_models', function (Blueprint $table) {
+        Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('school_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('student_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->constrained('school_classes')->cascadeOnDelete();
 
-            $table->string('relation');
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
-            $table->text('address')->nullable();
+            $table->string('name');
+            $table->string('code')->nullable();
+            $table->enum('type', ['core', 'elective', 'optional']);
+
+            $table->foreignId('teacher_id')->nullable()
+                ->constrained('teachers')->nullOnDelete();
 
             $table->timestamps();
         });
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('parent_models');
+        Schema::dropIfExists('subjects');
     }
 };

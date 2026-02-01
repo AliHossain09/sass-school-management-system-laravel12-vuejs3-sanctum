@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Student extends Model
 {
-       protected $fillable = ['student_code', 'user_id', 'school_id', 'first_name', 'last_name', 'class', 'academic_year',];
+       protected $fillable = ['student_code', 'user_id', 'school_id', 'first_name', 'last_name', 'class_id', 'section_id', 'academic_year',];
+
+
 
     // Auth user
     public function user()
@@ -21,8 +23,25 @@ class Student extends Model
     }
 
     // Parents
-    public function parents()
+    // public function parents()
+    // {
+    //     return $this->hasMany(ParentModel::class);
+    // }
+    // Section
+    public function section()
     {
-        return $this->hasMany(ParentModel::class);
+        return $this->belongsTo(Section::class, 'section_id');
     }
+    // Class
+    public function class()
+    {
+        return $this->belongsTo(ClassModel::class, 'class_id');
+    }
+    // Subjects
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'student_subject', 'student_id', 'subject_id');
+    }
+
+
 }

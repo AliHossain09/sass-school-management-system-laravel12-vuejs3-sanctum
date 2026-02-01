@@ -25,12 +25,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
     });
 
-    // Headmaster for Teachers
+    // Headmaster 
     Route::middleware('role:headmaster')->group(function () {
+        // Teacher Management
         Route::post('/teachers', [TeacherController::class, 'storeTeacher']);
         Route::get('/teachers', [TeacherController::class, 'indexTeachers']);
         Route::put('/teachers/{teacher}', [TeacherController::class, 'updateTeacher']);
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroyTeacher']);
+
+        //Student Management
+        Route::post('/students', [HeadmasterController::class, 'storeStudent']);
 
     });
 });
