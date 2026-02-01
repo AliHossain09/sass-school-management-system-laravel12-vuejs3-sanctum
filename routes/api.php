@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassController;
+use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\HeadmasterController;
 use App\Http\Controllers\Api\MasterAdminController;
@@ -33,6 +34,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/classes', [ClassController::class, 'store']); 
         Route::put('/classes/{schoolClass}', [ClassController::class, 'update']);
         Route::delete('/classes/{schoolClass}', [ClassController::class, 'destroy']);
+
+        // Section Management
+        Route::get('/sections', [SectionController::class, 'index']);
+        Route::post('/sections', [SectionController::class, 'store']);
+        Route::put('/sections/{section}', [SectionController::class, 'update']);
+        Route::delete('/sections/{section}', [SectionController::class, 'destroy']);
 
         // Teacher Management
         Route::post('/teachers', [TeacherController::class, 'storeTeacher']);
