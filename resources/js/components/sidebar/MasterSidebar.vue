@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { FaSchool, FaThList } from 'vue-icons-plus/fa'
 
 const props = defineProps({
   isOpen: Boolean
@@ -43,22 +44,20 @@ const logout = () => {
 
     <!-- MENU -->
     <nav class="flex flex-col gap-2">
-      <router-link
-        to="/master-dashboard"
-        class="px-3 py-2 rounded hover:bg-indigo-700"
-        active-class="bg-indigo-600"
-        @click="$emit('close')"
-      >
-        Dashboard
+      <router-link to="/master-dashboard" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2" active-class="bg-indigo-600"
+        @click="$emit('close')">
+        <FaSchool class="w-5 h-5 mr-2" />
+        <span>Dashboard</span>
       </router-link>
 
       <router-link
         to="/manage-schools"
-        class="px-3 py-2 rounded hover:bg-indigo-700"
+       class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
         active-class="bg-indigo-600"
         @click="$emit('close')"
       >
-        Manage Schools
+        <FaThList class="w-5 h-5 mr-2" />
+        <span>Manage Schools</span>
       </router-link>
     </nav>
 
