@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class SchoolClass extends Model
 {
-    protected $table = 'classes';
+    protected $table = 'school_classes';
+
+    protected $fillable = [
+        'school_id',
+        'name',
+        'order',
+        'group',
+        'description'
+    ];
 
     // One class has many sections
     public function sections()

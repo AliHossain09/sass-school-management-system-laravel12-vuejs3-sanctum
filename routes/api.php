@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClassController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\HeadmasterController;
 use App\Http\Controllers\Api\MasterAdminController;
@@ -27,6 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Headmaster 
     Route::middleware('role:headmaster')->group(function () {
+        // Class Management
+        Route::get('/classes', [ClassController::class, 'index']);
+        Route::post('/classes', [ClassController::class, 'store']); 
+        Route::put('/classes/{schoolClass}', [ClassController::class, 'update']);
+        Route::delete('/classes/{schoolClass}', [ClassController::class, 'destroy']);
+
         // Teacher Management
         Route::post('/teachers', [TeacherController::class, 'storeTeacher']);
         Route::get('/teachers', [TeacherController::class, 'indexTeachers']);

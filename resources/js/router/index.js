@@ -6,6 +6,8 @@ import HeadmasterDashboard from '../Pages/dashboard/HeadmasterDashboard.vue';
 import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
 import ManageSchools from '../components/MasterAdminMenu/ManageSchools.vue';
+// Classes
+import SchoolClasses from '../components/HeadmasterMenu/class/SchoolClasses.vue';
 // Student Routes
 import StudentAdmission from '../components/HeadmasterMenu/student/StudentAdmission.vue';
 import StudentList from '../components/HeadmasterMenu/student/StudentList.vue';
@@ -33,6 +35,8 @@ const routes = [
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
   { path: '/manage-schools', component: ManageSchools, beforeEnter: requireAuth },
+  // Classes
+  { path: '/school-classes', component: SchoolClasses, beforeEnter: requireAuth },
   // Student Routes
   { path: '/student-admission', component: StudentAdmission, beforeEnter: requireAuth },
   { path: '/students-list', component: StudentList, beforeEnter: requireAuth },

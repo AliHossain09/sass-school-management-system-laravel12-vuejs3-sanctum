@@ -54,6 +54,16 @@ const logout = () => {
         Dashboard
       </router-link>
 
+      <!-- Classes -->
+      <router-link
+        to="/school-classes"
+        class="px-3 py-2 rounded hover:bg-indigo-700"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
+        Classes
+      </router-link>
+
       <!-- STUDENT INFO -->
       <button
         class="px-3 py-2 rounded hover:bg-indigo-700 text-left flex justify-between items-center"
