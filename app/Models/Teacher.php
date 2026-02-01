@@ -69,4 +69,6 @@ class Teacher extends Model
     {
         return $this->hasMany(Section::class);
     }
+
+    
 }

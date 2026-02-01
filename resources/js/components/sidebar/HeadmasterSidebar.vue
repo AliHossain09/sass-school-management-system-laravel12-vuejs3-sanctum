@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { FaArchway, FaSchool, FaUserGraduate, FaUserTie, FaBorderAll } from 'vue-icons-plus/fa'
+import { FaAddressBook } from 'vue-icons-plus/fa'
 
 defineProps({
   isOpen: Boolean
@@ -57,6 +58,13 @@ const logout = () => {
         active-class="bg-indigo-600" @click="$emit('close')">
         <FaBorderAll class="w-5 h-5" />
         <span>Sections</span>
+      </router-link>
+
+      <!-- Subjects -->
+      <router-link to="/subjects" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600" @click="$emit('close')">
+        <FaAddressBook class="w-5 h-5" />
+        <span>Subjects</span>
       </router-link>
 
 

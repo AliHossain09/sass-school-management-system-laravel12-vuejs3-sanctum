@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\HeadmasterController;
 use App\Http\Controllers\Api\MasterAdminController;
@@ -40,6 +41,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/sections', [SectionController::class, 'store']);
         Route::put('/sections/{section}', [SectionController::class, 'update']);
         Route::delete('/sections/{section}', [SectionController::class, 'destroy']);
+
+        //Subject Management
+        // Subject Management
+        Route::get('/subjects', [SubjectController::class, 'index']);
+        Route::post('/subjects', [SubjectController::class, 'store']);
+        Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
+        Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
+
+        // Route::get('/subjects/teachers', [SubjectController::class, 'teachers']);
+
 
         // Teacher Management
         Route::post('/teachers', [TeacherController::class, 'storeTeacher']);
