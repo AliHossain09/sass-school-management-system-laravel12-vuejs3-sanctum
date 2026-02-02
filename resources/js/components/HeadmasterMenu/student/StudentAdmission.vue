@@ -8,10 +8,10 @@ import { useToast } from 'vue-toastification'
 const toast = useToast()
 const loading = ref(false)
 const error = ref('')
-const photoPreview = ref<string | null>(null)
+const photoPreview = ref < string | null > (null)
 
 /* ---------------- form (TYPED) ---------------- */
-const form = reactive<{
+const form = reactive < {
   student_code: string
   academic_year: string
   first_name: string
@@ -43,7 +43,7 @@ const form = reactive<{
   username: string
   password: string
   photo: File | null
-}>({
+} > ({
   student_code: '',
   academic_year: '',
   first_name: '',
@@ -78,13 +78,24 @@ const form = reactive<{
 })
 
 /* ---------------- dropdowns ---------------- */
-const classes = ref<any[]>([])
-const sections = ref<any[]>([])
+const classes = ref < any[] > ([])
+const sections = ref < any[] > ([])
+const electiveSubjects = ref < any[] > ([])
+
+// const electiveSubjects = ref<any[]>([
+//   { id: '1', name: 'Biology' },
+//   { id: '2', name: 'Computer Science' },
+//   { id: '3', name: 'Economics' },
+//   { id: '4', name: 'History' },
+//   { id: '5', name: 'Physics' },
+//   { id: '6', name: 'Chemistry' }
+// ])
 
 /* ---------------- auth header ---------------- */
 const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`
 })
+
 
 /* ---------------- load classes ---------------- */
 const loadClasses = async () => {
@@ -92,7 +103,7 @@ const loadClasses = async () => {
     const res = await axios.get('/api/classes', {
       headers: authHeader()
     })
-    classes.value = res.data.data   // 🔥 important
+    classes.value = res.data.data   // important
   } catch (err) {
     console.error(err)
     toast.error('Failed to load classes')
@@ -105,12 +116,24 @@ const loadSections = async () => {
     const res = await axios.get('/api/sections', {
       headers: authHeader()
     })
-    sections.value = res.data.data  // 🔥 important
+    sections.value = res.data.data  // important
   } catch (err) {
     console.error(err)
     toast.error('Failed to load sections')
   }
 }
+/* ---------------- load elective subjects ---------------- */
+const loadElectiveSubjects = async () => {
+  try {
+    const res = await axios.get('/subjects', {
+      headers: authHeader()
+    })
+    electiveSubjects.value = res.data
+  } catch (err) {
+    toast.error('Failed to load elective subjects')
+  }
+}
+
 
 /* ---------------- photo preview ---------------- */
 const onPhotoChange = (e: Event) => {
@@ -170,10 +193,12 @@ const submit = async () => {
   }
 }
 
+
 /* ---------------- mounted ---------------- */
 onMounted(() => {
   loadClasses()
   loadSections()
+  loadElectiveSubjects()
 })
 </script>
 
@@ -252,20 +277,20 @@ onMounted(() => {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-  <label class="mb-1 text-gray-600 font-medium" for="class_id">Class *</label>
-  <select id="class_id" v-model="form.class_id" class="input">
-    <option value="">Select Class</option>
-    <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
-  </select>
-</div>
+                <label class="mb-1 text-gray-600 font-medium" for="class_id">Class *</label>
+                <select id="class_id" v-model="form.class_id" class="input">
+                  <option value="">Select Class</option>
+                  <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
+                </select>
+              </div>
 
-<div class="flex flex-col">
-  <label class="mb-1 text-gray-600 font-medium" for="section_id">Section</label>
-  <select id="section_id" v-model="form.section_id" class="input">
-    <option value="">Select Section</option>
-    <option v-for="sec in sections" :key="sec.id" :value="sec.id">{{ sec.name }}</option>
-  </select>
-</div>
+              <div class="flex flex-col">
+                <label class="mb-1 text-gray-600 font-medium" for="section_id">Section</label>
+                <select id="section_id" v-model="form.section_id" class="input">
+                  <option value="">Select Section</option>
+                  <option v-for="sec in sections" :key="sec.id" :value="sec.id">{{ sec.name }}</option>
+                </select>
+              </div>
 
 
               <div class="flex flex-col">
@@ -290,10 +315,24 @@ onMounted(() => {
               </div>
 
               <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="board_registration_number">Board Registration Number</label>
+                <label class="mb-1 text-gray-600 font-medium" for="board_registration_number">Board Registration
+                  Number</label>
                 <input id="board_registration_number" v-model="form.board_registration_number" class="input" />
               </div>
             </div>
+
+            <div v-if="[9, 10, 11, 12].includes(Number(form.class_id))" class="flex flex-col">
+
+              <label class="mb-1 text-gray-600 font-medium">Elective Subject</label>
+              <select v-model="form.elective_subject_id" class="input">
+                <option value="">Select Elective Subject</option>
+                <option v-for="sub in electiveSubjects" :key="sub.id" :value="sub.id">
+                  {{ sub.name }}
+                </option>
+              </select>
+            </div>
+
+
           </section>
 
           <!-- GUARDIAN INFO -->
@@ -332,7 +371,8 @@ onMounted(() => {
               </div>
 
               <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="local_guardian_relationship">Guardian Relationship</label>
+                <label class="mb-1 text-gray-600 font-medium" for="local_guardian_relationship">Guardian
+                  Relationship</label>
                 <input id="local_guardian_relationship" v-model="form.local_guardian_relationship" class="input" />
               </div>
             </div>
@@ -384,11 +424,8 @@ onMounted(() => {
 
           <!-- PHOTO -->
           <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="file"
-              @change="onPhotoChange"
-              class="md:h-48 w-full border-2 border-dashed border-green-300 rounded-lg p-4"
-            />
+            <input type="file" @change="onPhotoChange"
+              class="md:h-48 w-full border-2 border-dashed border-green-300 rounded-lg p-4" />
             <img v-if="photoPreview" :src="photoPreview" class="md:h-40 mt-4 ml-2 rounded border" />
           </div>
 
@@ -409,12 +446,14 @@ onMounted(() => {
   border-radius: 4px;
   width: 100%;
 }
+
 .btn-primary {
   background: #2563eb;
   color: white;
   padding: 12px;
   border-radius: 6px;
 }
+
 .btn-primary:disabled {
   background: #a5b4fc;
 }
