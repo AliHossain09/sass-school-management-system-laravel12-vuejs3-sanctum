@@ -60,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
         //Student Management
         Route::post('/students', [HeadmasterController::class, 'storeStudent']);
+        Route::get('/students', [HeadmasterController::class, 'indexStudents']);
+        Route::put('/students/{student}', [HeadmasterController::class, 'updateStudent']);
+        Route::delete('/students/{student}', [HeadmasterController::class, 'destroyStudent']);
 
     });
 });

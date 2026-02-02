@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('nationality')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->string('photo')->nullable(); // student photo
             $table->text('extra_curricular')->nullable();
             $table->text('description')->nullable();
 
@@ -46,6 +47,7 @@ return new class extends Migration
             // Academic Info
             $table->foreignId('class_id')->constrained('school_classes');
             $table->foreignId('section_id')->nullable()->constrained('sections');
+            $table->string('academic_year');
 
             $table->string('shift')->nullable();
             $table->string('id_card_number')->nullable();
@@ -58,6 +60,10 @@ return new class extends Migration
             // Access Info
             $table->string('username')->unique()->nullable();
             $table->string('password')->nullable();
+
+            // Access Info (Student Table)
+            $table->string('username')->unique();
+            $table->string('password');
 
             $table->timestamps();
         });

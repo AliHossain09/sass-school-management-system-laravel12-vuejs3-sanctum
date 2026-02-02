@@ -10,11 +10,21 @@ class Student extends Model
         'student_code',
         'user_id',
         'school_id',
+
+        // Personal Info
         'first_name',
         'last_name',
-        'class_id',       // FK to school_classes
-        'section_id',     // FK to sections
-        'academic_year',
+        'dob',
+        'gender',
+        'religion',
+        'nationality',
+        'email',
+        'phone',
+        'photo',
+        'extra_curricular',
+        'description',
+
+        // Guardian Info
         'father_name',
         'father_phone',
         'mother_name',
@@ -22,24 +32,25 @@ class Student extends Model
         'local_guardian_name',
         'local_guardian_phone',
         'local_guardian_relationship',
-        'dob',
-        'gender',
-        'religion',
-        'nationality',
-        'email',
-        'phone',
-        'extra_curricular',
-        'description',
+
+        // Address
+        'present_address',
+        'permanent_address',
+
+        // Academic Info
+        'class_id',
+        'section_id',
+        'academic_year',
         'shift',
         'id_card_number',
         'roll_number',
         'board_registration_number',
         'elective_subject_id',
+
+        // Access Info
         'username',
-        'password'
+        'password',
     ];
-
-
 
     // Auth user
     public function user()
@@ -53,29 +64,21 @@ class Student extends Model
         return $this->belongsTo(School::class);
     }
 
-    // Parents
-    // public function parents()
-    // {
-    //     return $this->hasMany(ParentModel::class);
-    // }
-    
-  // Class 
-    public function class()
+    // Class
+    public function schoolClass()
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
     }
 
-    // Section 
+    // Section
     public function section()
     {
         return $this->belongsTo(Section::class, 'section_id');
     }
 
-    // Elective subject 
+    // Elective subject
     public function electiveSubject()
     {
         return $this->belongsTo(Subject::class, 'elective_subject_id');
     }
-
-
 }
