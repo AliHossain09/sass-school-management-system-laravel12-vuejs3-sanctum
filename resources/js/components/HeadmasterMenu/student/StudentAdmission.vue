@@ -178,7 +178,13 @@ const submit = async () => {
 
               <div class="flex flex-col">
                 <label class="mb-1 text-gray-600 font-medium" for="shift">Shift</label>
-                <input id="shift" v-model="form.shift" class="input" />
+                <select id="shift" v-model="form.shift" class="input">
+                  <option value="">Select Shift</option>
+                  <option value="morning">Morning</option>
+                  <option value="afternoon">Afternoon</option>
+                  <option value="day">Day</option>
+                  <option value="evening">Evening</option>
+                </select>
               </div>
 
               <div class="flex flex-col">
