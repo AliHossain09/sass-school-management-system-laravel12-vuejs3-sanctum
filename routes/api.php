@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassController;
 use App\Http\Controllers\Api\SectionController;
+use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\HeadmasterController;
@@ -59,10 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroyTeacher']);
 
         //Student Management
-        Route::post('/students', [HeadmasterController::class, 'storeStudent']);
-        Route::get('/students', [HeadmasterController::class, 'indexStudents']);
-        Route::put('/students/{student}', [HeadmasterController::class, 'updateStudent']);
-        Route::delete('/students/{student}', [HeadmasterController::class, 'destroyStudent']);
+        Route::post('/students', [StudentController::class, 'storeStudent']);
+        Route::get('/students', [StudentController::class, 'indexStudents']);
+        Route::put('/students/{student}', [StudentController::class, 'updateStudent']);
+        Route::delete('/students/{student}', [StudentController::class, 'destroyStudent']);
 
     });
 });

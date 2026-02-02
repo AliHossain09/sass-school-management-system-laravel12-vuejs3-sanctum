@@ -57,12 +57,44 @@ const form = ref<any>({
     photo: null
 })
 
+const classes = ref<any[]>([])
+const sections = ref<any[]>([])
+const electiveSubjects = ref<any[]>([])
+
 const search = ref('')
 let searchTimeout: any = null
 
 const authHeader = () => ({
     Authorization: `Bearer ${localStorage.getItem('token')}`
 })
+
+/* --- Load dropdowns --- */
+const loadClasses = async () => {
+    try {
+        const res = await axios.get('/api/classes', { headers: authHeader() })
+        classes.value = res.data.data
+    } catch (err) {
+        toast.error('Failed to load classes')
+    }
+}
+
+const loadSections = async () => {
+    try {
+        const res = await axios.get('/api/sections', { headers: authHeader() })
+        sections.value = res.data.data
+    } catch (err) {
+        toast.error('Failed to load sections')
+    }
+}
+
+const loadElectiveSubjects = async () => {
+    try {
+        const res = await axios.get('/subjects', { headers: authHeader() })
+        electiveSubjects.value = res.data
+    } catch (err) {
+        toast.error('Failed to load elective subjects')
+    }
+}
 
 /* --- Load Students --- */
 const loadStudents = async (page = 1) => {
@@ -75,13 +107,18 @@ const loadStudents = async (page = 1) => {
         students.value = res.data.data
         meta.value = res.data.meta
     } catch (err) {
-        console.error('Failed to load students', err)
+        toast.error('Failed to load students')
     } finally {
         loading.value = false
     }
 }
 
-onMounted(() => loadStudents())
+onMounted(() => {
+    loadStudents()
+    loadClasses()
+    loadSections()
+    loadElectiveSubjects()
+})
 
 /* --- Search debounce --- */
 watch(search, () => {
@@ -94,39 +131,7 @@ const openForm = () => {
     activeForm.value = true
     editingStudent.value = null
     photoPreview.value = null
-    form.value = {
-        student_code: '',
-        academic_year: '',
-        first_name: '',
-        last_name: '',
-        gender: '',
-        dob: '',
-        religion: '',
-        nationality: '',
-        phone: '',
-        email: '',
-        present_address: '',
-        permanent_address: '',
-        father_name: '',
-        father_phone: '',
-        mother_name: '',
-        mother_phone: '',
-        local_guardian_name: '',
-        local_guardian_phone: '',
-        local_guardian_relationship: '',
-        class_id: '',
-        section_id: '',
-        shift: '',
-        roll_number: '',
-        id_card_number: '',
-        board_registration_number: '',
-        elective_subject_id: '',
-        extra_curricular: '',
-        description: '',
-        username: '',
-        password: '',
-        photo: null
-    }
+    Object.keys(form.value).forEach(key => form.value[key] = key === 'photo' ? null : '')
 }
 
 /* --- Photo change --- */
@@ -134,7 +139,6 @@ const onPhotoChange = (e: Event) => {
     const target = e.target as HTMLInputElement
     if (target.files && target.files[0]) {
         form.value.photo = target.files[0]
-
         const reader = new FileReader()
         reader.onload = () => (photoPreview.value = reader.result as string)
         reader.readAsDataURL(target.files[0])

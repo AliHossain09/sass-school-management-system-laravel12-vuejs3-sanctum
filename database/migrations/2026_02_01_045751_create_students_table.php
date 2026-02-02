@@ -61,10 +61,6 @@ return new class extends Migration
             $table->string('username')->unique()->nullable();
             $table->string('password')->nullable();
 
-            // Access Info (Student Table)
-            $table->string('username')->unique();
-            $table->string('password');
-
             $table->timestamps();
         });
     }

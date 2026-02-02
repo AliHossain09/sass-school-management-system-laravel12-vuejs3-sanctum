@@ -18,7 +18,7 @@ class StudentController extends Controller
         $perPage = $request->get('per_page', 10);
         $search = $request->get('search');
 
-        $query = Student::with(['class', 'section', 'electiveSubject'])
+        $query = Student::with(['schoolClass', 'section', 'electiveSubject'])
             ->where('school_id', auth()->user()->school_id);
 
         if ($search) {
