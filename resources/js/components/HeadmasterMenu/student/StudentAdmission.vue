@@ -1,17 +1,49 @@
-<script setup>
-import { reactive, ref } from 'vue'
+<script setup lang="ts">
+import { reactive, ref, onMounted } from 'vue'
 import axios from 'axios'
 import HeadmasterLayout from '../../../layouts/HeadmasterLayout.vue'
 import { useToast } from 'vue-toastification'
 
+/* ---------------- basic ---------------- */
 const toast = useToast()
 const loading = ref(false)
 const error = ref('')
+const photoPreview = ref<string | null>(null)
 
-const photoPreview = ref(null)
-
-/* ---------------- form ---------------- */
-const form = reactive({
+/* ---------------- form (TYPED) ---------------- */
+const form = reactive<{
+  student_code: string
+  academic_year: string
+  first_name: string
+  last_name: string
+  gender: string
+  dob: string
+  religion: string
+  nationality: string
+  phone: string
+  email: string
+  present_address: string
+  permanent_address: string
+  father_name: string
+  father_phone: string
+  mother_name: string
+  mother_phone: string
+  local_guardian_name: string
+  local_guardian_phone: string
+  local_guardian_relationship: string
+  class_id: string
+  section_id: string
+  shift: string
+  roll_number: string
+  id_card_number: string
+  board_registration_number: string
+  elective_subject_id: string
+  extra_curricular: string
+  description: string
+  username: string
+  password: string
+  photo: File | null
+}>({
   student_code: '',
   academic_year: '',
   first_name: '',
@@ -45,54 +77,107 @@ const form = reactive({
   photo: null
 })
 
-/* ---------------- auth ---------------- */
+/* ---------------- dropdowns ---------------- */
+const classes = ref<any[]>([])
+const sections = ref<any[]>([])
+
+/* ---------------- auth header ---------------- */
 const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`
 })
 
-/* ---------------- photo ---------------- */
-const onPhotoChange = (e) => {
-  const file = e.target.files[0]
-  if (!file) return
-  form.photo = file
+/* ---------------- load classes ---------------- */
+const loadClasses = async () => {
+  try {
+    const res = await axios.get('/api/classes', {
+      headers: authHeader()
+    })
+    classes.value = res.data.data   // 🔥 important
+  } catch (err) {
+    console.error(err)
+    toast.error('Failed to load classes')
+  }
+}
 
-  const reader = new FileReader()
-  reader.onload = () => (photoPreview.value = reader.result)
-  reader.readAsDataURL(file)
+/* ---------------- load sections ---------------- */
+const loadSections = async () => {
+  try {
+    const res = await axios.get('/api/sections', {
+      headers: authHeader()
+    })
+    sections.value = res.data.data  // 🔥 important
+  } catch (err) {
+    console.error(err)
+    toast.error('Failed to load sections')
+  }
+}
+
+/* ---------------- photo preview ---------------- */
+const onPhotoChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+
+  if (target.files && target.files[0]) {
+    form.photo = target.files[0]
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      photoPreview.value = reader.result as string
+    }
+    reader.readAsDataURL(target.files[0])
+  }
 }
 
 /* ---------------- submit ---------------- */
 const submit = async () => {
   error.value = ''
 
-  if (!form.first_name || !form.last_name || !form.gender || !form.class_id) {
+  if (!form.first_name || !form.last_name || !form.gender || !form.class_id || !form.username || !form.password) {
     toast.error('Please fill all required fields')
     return
   }
 
   const data = new FormData()
-  Object.entries(form).forEach(([k, v]) => {
-    if (v !== null && v !== '') data.append(k, v)
+  Object.entries(form).forEach(([key, value]) => {
+    if (value !== null && value !== '') {
+      data.append(key, value as any)
+    }
   })
 
   try {
     loading.value = true
+
     await axios.post('/api/students', data, {
-      headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' }
+      headers: {
+        ...authHeader(),
+        'Content-Type': 'multipart/form-data'
+      }
     })
 
     toast.success('Student admitted successfully')
 
-    Object.keys(form).forEach(k => (form[k] = ''))
+    Object.keys(form).forEach((key) => {
+      // @ts-ignore
+      form[key] = ''
+    })
+
     form.photo = null
     photoPreview.value = null
-  } catch (e) {
+
+  } catch (e: any) {
     toast.error(e.response?.data?.message || 'Failed to admit student')
   } finally {
     loading.value = false
   }
 }
+
+/* ---------------- mounted ---------------- */
+onMounted(() => {
+  loadClasses()
+  loadSections()
+})
 </script>
+
+
 
 <template>
   <HeadmasterLayout>
@@ -167,14 +252,21 @@ const submit = async () => {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="class_id">Class ID *</label>
-                <input id="class_id" v-model="form.class_id" class="input" />
-              </div>
+  <label class="mb-1 text-gray-600 font-medium" for="class_id">Class *</label>
+  <select id="class_id" v-model="form.class_id" class="input">
+    <option value="">Select Class</option>
+    <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
+  </select>
+</div>
 
-              <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="section_id">Section ID</label>
-                <input id="section_id" v-model="form.section_id" class="input" />
-              </div>
+<div class="flex flex-col">
+  <label class="mb-1 text-gray-600 font-medium" for="section_id">Section</label>
+  <select id="section_id" v-model="form.section_id" class="input">
+    <option value="">Select Section</option>
+    <option v-for="sec in sections" :key="sec.id" :value="sec.id">{{ sec.name }}</option>
+  </select>
+</div>
+
 
               <div class="flex flex-col">
                 <label class="mb-1 text-gray-600 font-medium" for="shift">Shift</label>
