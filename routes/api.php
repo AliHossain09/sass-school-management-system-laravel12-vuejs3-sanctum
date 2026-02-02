@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\HeadmasterController;
 use App\Http\Controllers\Api\MasterAdminController;
+use App\Http\Controllers\Api\AcademicYearController;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
@@ -64,6 +65,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/students', [StudentController::class, 'indexStudents']);
         Route::put('/students/{student}', [StudentController::class, 'updateStudent']);
         Route::delete('/students/{student}', [StudentController::class, 'destroyStudent']);
+
+        // AcademicYear
+        Route::get('/academic-years', [AcademicYearController::class, 'index']);
+        Route::post('/academic-years', [AcademicYearController::class, 'store']);
+        Route::put('/academic-years/{academicYear}', [AcademicYearController::class, 'update']);
+        Route::delete('/academic-years/{academicYear}', [AcademicYearController::class, 'destroy']);
 
     });
 });

@@ -20,6 +20,8 @@ import StudentAttendance from '../components/HeadmasterMenu/student/StudentAtten
 import AddTeacher from '../components/HeadmasterMenu/teacher/AddTeacher.vue';
 import TeacherList from '../components/HeadmasterMenu/teacher/TeacherList.vue';
 import TeacherAttendance from '../components/HeadmasterMenu/teacher/TeacherAttendance.vue';
+//AcademicYear
+import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear.vue';
 import axios from 'axios';
 
 const requireAuth = (to, from, next) => {
@@ -53,6 +55,8 @@ const routes = [
   { path: '/teachers-add', component: AddTeacher, beforeEnter: requireAuth },
   { path: '/teachers-list', component: TeacherList, beforeEnter: requireAuth },
   { path: '/teacher-attendance', component: TeacherAttendance, beforeEnter: requireAuth },
+  //AcademicYear
+  { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
 
 ]
 
