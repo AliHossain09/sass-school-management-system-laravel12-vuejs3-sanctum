@@ -59,9 +59,18 @@ class TeacherController extends Controller
                 ->store('teachers', 'public');
         }
 
+        //new User creation for teacher
+        $user = User::create([
+            'name' => $request->first_name . ' ' . $request->last_name,
+            'email' => $request->email,
+            'password' => bcrypt('password'), // Default password, should be changed later
+            'role' => 'teacher',
+            'school_id' => auth()->user()->school_id,
+        ]);
+
         $teacher = Teacher::create([
             'teacher_code' => 'T-'.strtoupper(Str::random(6)),
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
             'school_id' => auth()->user()->school_id,
 
             'first_name' => $request->first_name,

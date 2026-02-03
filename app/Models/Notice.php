@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\School;
+use App\Models\Section;
 use Illuminate\Database\Eloquent\Model;
 
 class Notice extends Model
@@ -26,5 +27,10 @@ class Notice extends Model
     public function school()
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function sections()
+    {
+        return $this->belongsToMany(Section::class, 'notice_section');
     }
 }
