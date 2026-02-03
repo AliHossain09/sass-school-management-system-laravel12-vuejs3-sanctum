@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { FaArchway, FaSchool, FaUserGraduate, FaUserTie, FaBorderAll } from 'vue-icons-plus/fa'
-import { FaAddressBook } from 'vue-icons-plus/fa'
+import { FaAddressBook, FaCalendar } from 'vue-icons-plus/fa'
 
 defineProps({
   isOpen: Boolean
@@ -114,6 +114,13 @@ const logout = () => {
           Teacher Attendance
         </router-link>
       </div>
+
+      <!-- Events -->
+      <router-link to="/events-list" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600" @click="$emit('close')">
+        <FaCalendar class="w-5 h-5 mr-2" />
+        <span>Events</span>
+      </router-link>
 
       <!-- Academic Year -->
       <router-link to="/academic-year" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
