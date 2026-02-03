@@ -26,7 +26,7 @@ const logout = () => {
           ☰
         </button>
 
-        <h1 class="font-bold text-lg text-white">Master Admin</h1>
+        <h1 class="font-bold text-2xl text-white">Master Admin</h1>
       </div>
 
       <button

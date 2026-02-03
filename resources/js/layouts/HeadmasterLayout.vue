@@ -10,7 +10,7 @@
           ☰
         </button>
 
-        <h1 class="font-bold text-lg text-white">
+        <h1 class="font-bold text-2xl text-white">
           Headmaster Dashboard
         </h1>
       </div>
