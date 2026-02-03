@@ -115,6 +115,13 @@ const logout = () => {
         </router-link>
       </div>
 
+      <!-- Notices -->
+      <router-link to="/notices" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600" @click="$emit('close')">
+        <FaAddressBook class="w-5 h-5 mr-2" />
+        <span>Notices</span>
+      </router-link>
+
       <!-- Events -->
       <router-link to="/events-list" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
         active-class="bg-indigo-600" @click="$emit('close')">

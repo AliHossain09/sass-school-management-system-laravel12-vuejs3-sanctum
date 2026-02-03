@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassController;
 use App\Http\Controllers\Api\EventController;
@@ -45,7 +46,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/sections/{section}', [SectionController::class, 'destroy']);
 
         // Subject Management
-        // Subject Management
         Route::get('/subjects', [SubjectController::class, 'index']);
         Route::post('/subjects', [SubjectController::class, 'store']);
         Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
@@ -64,6 +64,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/students', [StudentController::class, 'indexStudents']);
         Route::put('/students/{student}', [StudentController::class, 'updateStudent']);
         Route::delete('/students/{student}', [StudentController::class, 'destroyStudent']);
+        
+        // Notices Management
+        Route::get('/notices', [NoticeController::class, 'index']);
+        Route::post('/notices', [NoticeController::class, 'store']);
+        Route::put('/notices/{notice}', [NoticeController::class, 'update']);
+        Route::delete('/notices/{notice}', [NoticeController::class, 'destroy']);
+
         // Events Management
         Route::get('/events', [EventController::class, 'index']);
         Route::post('/events', [EventController::class, 'store']);

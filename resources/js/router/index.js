@@ -20,6 +20,8 @@ import StudentAttendance from '../components/HeadmasterMenu/student/StudentAtten
 import AddTeacher from '../components/HeadmasterMenu/teacher/AddTeacher.vue';
 import TeacherList from '../components/HeadmasterMenu/teacher/TeacherList.vue';
 import TeacherAttendance from '../components/HeadmasterMenu/teacher/TeacherAttendance.vue';
+//Notices
+import NoticeList from '../components/HeadmasterMenu/notices/NoticeList.vue';
 //events
 import EventsList from '../components/HeadmasterMenu/events/EventList.vue';
 //AcademicYear
@@ -57,7 +59,9 @@ const routes = [
   { path: '/teachers-add', component: AddTeacher, beforeEnter: requireAuth },
   { path: '/teachers-list', component: TeacherList, beforeEnter: requireAuth },
   { path: '/teacher-attendance', component: TeacherAttendance, beforeEnter: requireAuth },
-    //Events
+  //Notices
+  { path: '/notices', component: NoticeList, beforeEnter: requireAuth },
+  //Events
   { path: '/events-list', component: EventsList, beforeEnter: requireAuth },
   //AcademicYear
   { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
