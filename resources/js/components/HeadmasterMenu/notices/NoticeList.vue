@@ -200,6 +200,12 @@ const deleteNotice = async (id: number) => {
 
 <template>
 <HeadmasterLayout>
+    <!-- Breadcrumb -->
+        <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2">
+            <p class="text-gray-700">Headmaster ></p>
+            <p class="text-gray-700">Notice ></p>
+            <p class="text-gray-700">List</p>
+        </div>
 
     <!-- Header -->
     <div class="flex justify-between items-center mb-6">
