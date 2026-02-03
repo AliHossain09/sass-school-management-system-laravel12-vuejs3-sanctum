@@ -1,11 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../Pages/Login.vue';
 import Register from '../Pages/Register.vue';
+
+//.................................Mater Admin Dashboard....................................
 import MasterDashboard from '../Pages/dashboard/MasterDashboard.vue';
-import HeadmasterDashboard from '../Pages/dashboard/HeadmasterDashboard.vue';
-import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
-import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
 import ManageSchools from '../components/MasterAdminMenu/ManageSchools.vue';
+
+//.................................HeadMater Admin Dashboard................................
+import HeadmasterDashboard from '../Pages/dashboard/HeadmasterDashboard.vue';
 // Classes
 import SchoolClasses from '../components/HeadmasterMenu/class/SchoolClasses.vue';
 //Section Routes
@@ -26,6 +28,15 @@ import NoticeList from '../components/HeadmasterMenu/notices/NoticeList.vue';
 import EventsList from '../components/HeadmasterMenu/events/EventList.vue';
 //AcademicYear
 import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear.vue';
+
+
+//.................................Teacher Dashboard.......................................
+import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
+
+//.................................Student Dashboard.......................................
+import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
+
+
 import axios from 'axios';
 
 const requireAuth = (to, from, next) => {
@@ -40,11 +51,12 @@ const routes = [
   { path: '/login', component: Login },
   { path: '/register', component: Register },
 
+  //.................................Mater Admin Dashboard....................................
   { path: '/master-dashboard', component: MasterDashboard, beforeEnter: requireAuth },
-  { path: '/headmaster-dashboard', component: HeadmasterDashboard, beforeEnter: requireAuth },
-  { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
-  { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
   { path: '/manage-schools', component: ManageSchools, beforeEnter: requireAuth },
+
+  //.................................HeadMater Admin Dashboard................................
+  { path: '/headmaster-dashboard', component: HeadmasterDashboard, beforeEnter: requireAuth },
   // Classes
   { path: '/school-classes', component: SchoolClasses, beforeEnter: requireAuth },
   //Section Routes
@@ -65,6 +77,13 @@ const routes = [
   { path: '/events-list', component: EventsList, beforeEnter: requireAuth },
   //AcademicYear
   { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
+
+  //.................................Teacher Dashboard........................................
+  { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
+
+  //.................................Student Dashboard........................................
+  { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
+
 
 ]
 
