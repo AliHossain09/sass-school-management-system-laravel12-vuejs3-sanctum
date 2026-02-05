@@ -223,19 +223,22 @@ const submit = async () => {
 
 </div>
 
-        <!-- Photo Upload -->
-        <div class="w-full grid place-items-center">
-          <input type="file" @change="onPhotoChange" accept="image/*" class="col-span-2 h-40 border-2 border-dashed border-green-300 rounded-lg p-4" />
-          <div v-if="photoPreview" class="mt-4">
-            <p class="mb-1">Preview:</p>
-            <img :src="photoPreview" alt="Preview" class="h-40 rounded border" />
-          </div>
-        </div>
+        
 
-        <!-- Submit -->
-        <button type="submit" class="btn btn-primary w-full" :disabled="loading">
-          {{ loading ? 'Saving...' : 'Save Teacher' }}
-        </button>
+         <!-- PHOTO (RIGHT SIDE, SAME ROW) -->
+          <section class="w-full grid place-items-center p-4 rounded shadow-sm bg-gray-100">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input type="file" @change="onPhotoChange" class="md:h-48 w-full border-3 border-dashed border-green-300 rounded-lg p-4" /> 
+            <img v-if="photoPreview" :src="photoPreview" class="md:h-40 mt-4 ml-2 rounded border" />
+          </div>
+          </section>
+
+          <!-- SAVE -->
+          <button class="btn-primary w-full md:col-span-2" :disabled="loading">
+            {{ loading ? 'Saving...' : 'Save Teacher' }}
+          </button>
+
+
       </form>
     </div>
   </HeadmasterLayout>
