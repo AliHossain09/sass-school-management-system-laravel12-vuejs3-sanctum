@@ -186,7 +186,7 @@ const deleteEvent = async (id: number) => {
         <FullCalendar :options="calendarOptions" />
       </div>
 
-      <div class="bg-white shadow-md rounded p-4">
+      <div class="bg-white shadow-md rounded p-4 self-start">
         <div>
         <!-- Search -->
         <div class="mb-3 flex justify-center">
