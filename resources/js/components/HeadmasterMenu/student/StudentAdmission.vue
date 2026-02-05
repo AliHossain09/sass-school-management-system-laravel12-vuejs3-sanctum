@@ -8,10 +8,10 @@ import { useToast } from 'vue-toastification'
 const toast = useToast()
 const loading = ref(false)
 const error = ref('')
-const photoPreview = ref < string | null > (null)
+const photoPreview = ref<string | null>(null)
 
 /* ---------------- form (TYPED) ---------------- */
-const form = reactive < {
+const form = reactive<{
   student_code: string
   academic_year: string
   first_name: string
@@ -43,7 +43,7 @@ const form = reactive < {
   username: string
   password: string
   photo: File | null
-} > ({
+}>({
   student_code: '',
   academic_year: '',
   first_name: '',
@@ -78,9 +78,9 @@ const form = reactive < {
 })
 
 /* ---------------- dropdowns ---------------- */
-const classes = ref < any[] > ([])
-const sections = ref < any[] > ([])
-const electiveSubjects = ref < any[] > ([])
+const classes = ref<any[]>([])
+const sections = ref<any[]>([])
+const electiveSubjects = ref<any[]>([])
 
 // const electiveSubjects = ref<any[]>([
 //   { id: '1', name: 'Biology' },
@@ -207,7 +207,7 @@ onMounted(() => {
 <template>
   <HeadmasterLayout>
     <!-- breadcrumb -->
-    <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2">
+    <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2 flex-wrap">
       <p class="text-gray-700">Head Master Admin ></p>
       <p class="text-gray-700">Student ></p>
       <p class="text-gray-700">Add Student</p>
@@ -221,32 +221,34 @@ onMounted(() => {
 
           <!-- BASIC INFO -->
           <section class="bg-gray-100 p-4 rounded shadow-sm">
-            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">BASIC INFORMATION</h2>
+            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">
+              BASIC INFORMATION
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="first_name">First Name *</label>
-                <input id="first_name" v-model="form.first_name" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">First Name *</label>
+                <input v-model="form.first_name" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="last_name">Last Name *</label>
-                <input id="last_name" v-model="form.last_name" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Last Name *</label>
+                <input v-model="form.last_name" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="student_code">Student Code *</label>
-                <input id="student_code" v-model="form.student_code" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Student Code *</label>
+                <input v-model="form.student_code" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="academic_year">Academic Year *</label>
-                <input id="academic_year" v-model="form.academic_year" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Academic Year *</label>
+                <input v-model="form.academic_year" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="gender">Gender *</label>
-                <select id="gender" v-model="form.gender" class="input">
+                <label class="mb-1 text-gray-600 font-medium">Gender *</label>
+                <select v-model="form.gender" class="input">
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -255,47 +257,52 @@ onMounted(() => {
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="dob">Date of Birth</label>
-                <input type="date" id="dob" v-model="form.dob" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Date of Birth</label>
+                <input type="date" v-model="form.dob" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="religion">Religion</label>
-                <input id="religion" v-model="form.religion" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Religion</label>
+                <input v-model="form.religion" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="nationality">Nationality</label>
-                <input id="nationality" v-model="form.nationality" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Nationality</label>
+                <input v-model="form.nationality" class="input" />
               </div>
             </div>
           </section>
 
           <!-- ACADEMIC INFO -->
           <section class="bg-gray-100 p-4 rounded shadow-sm">
-            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">ACADEMIC INFORMATION</h2>
+            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">
+              ACADEMIC INFORMATION
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="class_id">Class *</label>
-                <select id="class_id" v-model="form.class_id" class="input">
+                <label class="mb-1 text-gray-600 font-medium">Class *</label>
+                <select v-model="form.class_id" class="input">
                   <option value="">Select Class</option>
-                  <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
+                  <option v-for="cls in classes" :key="cls.id" :value="cls.id">
+                    {{ cls.name }}
+                  </option>
                 </select>
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="section_id">Section</label>
-                <select id="section_id" v-model="form.section_id" class="input">
+                <label class="mb-1 text-gray-600 font-medium">Section</label>
+                <select v-model="form.section_id" class="input">
                   <option value="">Select Section</option>
-                  <option v-for="sec in sections" :key="sec.id" :value="sec.id">{{ sec.name }}</option>
+                  <option v-for="sec in sections" :key="sec.id" :value="sec.id">
+                    {{ sec.name }}
+                  </option>
                 </select>
               </div>
 
-
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="shift">Shift</label>
-                <select id="shift" v-model="form.shift" class="input">
+                <label class="mb-1 text-gray-600 font-medium">Shift</label>
+                <select v-model="form.shift" class="input">
                   <option value="">Select Shift</option>
                   <option value="morning">Morning</option>
                   <option value="afternoon">Afternoon</option>
@@ -305,25 +312,27 @@ onMounted(() => {
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="roll_number">Roll Number</label>
-                <input id="roll_number" v-model="form.roll_number" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Roll Number</label>
+                <input v-model="form.roll_number" class="input" />
               </div>
 
               <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="id_card_number">ID Card Number</label>
-                <input id="id_card_number" v-model="form.id_card_number" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">ID Card Number</label>
+                <input v-model="form.id_card_number" class="input" />
               </div>
 
               <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="board_registration_number">Board Registration
-                  Number</label>
-                <input id="board_registration_number" v-model="form.board_registration_number" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">
+                  Board Registration Number
+                </label>
+                <input v-model="form.board_registration_number" class="input" />
               </div>
             </div>
 
-            <div v-if="[9, 10, 11, 12].includes(Number(form.class_id))" class="flex flex-col">
-
-              <label class="mb-1 text-gray-600 font-medium">Elective Subject</label>
+            <div v-if="[9, 10, 11, 12].includes(Number(form.class_id))" class="flex flex-col mt-4">
+              <label class="mb-1 text-gray-600 font-medium">
+                Elective Subject
+              </label>
               <select v-model="form.elective_subject_id" class="input">
                 <option value="">Select Elective Subject</option>
                 <option v-for="sub in electiveSubjects" :key="sub.id" :value="sub.id">
@@ -331,113 +340,128 @@ onMounted(() => {
                 </option>
               </select>
             </div>
-
-
           </section>
 
           <!-- GUARDIAN INFO -->
           <section class="bg-gray-100 p-4 rounded shadow-sm">
-            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">GUARDIAN INFORMATION</h2>
+            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">
+              GUARDIAN INFORMATION
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="father_name">Father Name</label>
-                <input id="father_name" v-model="form.father_name" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Father Name</label>
+                <input v-model="form.father_name" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="father_phone">Father Phone</label>
-                <input id="father_phone" v-model="form.father_phone" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Father Phone</label>
+                <input v-model="form.father_phone" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="mother_name">Mother Name</label>
-                <input id="mother_name" v-model="form.mother_name" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Mother Name</label>
+                <input v-model="form.mother_name" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="mother_phone">Mother Phone</label>
-                <input id="mother_phone" v-model="form.mother_phone" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Mother Phone</label>
+                <input v-model="form.mother_phone" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="local_guardian_name">Local Guardian Name</label>
-                <input id="local_guardian_name" v-model="form.local_guardian_name" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">
+                  Local Guardian Name
+                </label>
+                <input v-model="form.local_guardian_name" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="local_guardian_phone">Local Guardian Phone</label>
-                <input id="local_guardian_phone" v-model="form.local_guardian_phone" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">
+                  Local Guardian Phone
+                </label>
+                <input v-model="form.local_guardian_phone" class="input" />
               </div>
 
               <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="local_guardian_relationship">Guardian
-                  Relationship</label>
-                <input id="local_guardian_relationship" v-model="form.local_guardian_relationship" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">
+                  Guardian Relationship
+                </label>
+                <input v-model="form.local_guardian_relationship" class="input" />
               </div>
             </div>
           </section>
 
           <!-- CONTACT INFO -->
           <section class="bg-gray-100 p-4 rounded shadow-sm">
-            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">CONTACT INFORMATION</h2>
+            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">
+              CONTACT INFORMATION
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="phone">Phone</label>
-                <input id="phone" v-model="form.phone" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Phone</label>
+                <input v-model="form.phone" class="input" />
               </div>
 
-              <div class="flex flex-col ">
-                <label class="mb-1 text-gray-600 font-medium" for="email">Email</label>
-                <input id="email" v-model="form.email" class="input" />
-              </div>
-
-              <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="present_address">Present Address</label>
-                <textarea id="present_address" v-model="form.present_address" class="input"></textarea>
+              <div class="flex flex-col">
+                <label class="mb-1 text-gray-600 font-medium">Email</label>
+                <input v-model="form.email" class="input" />
               </div>
 
               <div class="flex flex-col md:col-span-2">
-                <label class="mb-1 text-gray-600 font-medium" for="permanent_address">Permanent Address</label>
-                <textarea id="permanent_address" v-model="form.permanent_address" class="input md:h-28"></textarea>
+                <label class="mb-1 text-gray-600 font-medium">
+                  Present Address
+                </label>
+                <textarea v-model="form.present_address" class="input"></textarea>
+              </div>
+
+              <div class="flex flex-col md:col-span-2">
+                <label class="mb-1 text-gray-600 font-medium">
+                  Permanent Address
+                </label>
+                <textarea v-model="form.permanent_address" class="input md:h-28"></textarea>
               </div>
             </div>
           </section>
 
           <!-- ACCESS INFO -->
           <section class="bg-gray-100 p-4 rounded shadow-sm">
-            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">ACCESS INFORMATION</h2>
+            <h2 class="font-semibold mb-6 border-b-2 border-gray-300">
+              ACCESS INFORMATION
+            </h2>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="username">Username *</label>
-                <input id="username" v-model="form.username" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Username *</label>
+                <input v-model="form.username" class="input" />
               </div>
 
               <div class="flex flex-col">
-                <label class="mb-1 text-gray-600 font-medium" for="password">Password *</label>
-                <input id="password" type="password" v-model="form.password" class="input" />
+                <label class="mb-1 text-gray-600 font-medium">Password *</label>
+                <input type="password" v-model="form.password" class="input" />
               </div>
             </div>
           </section>
 
-          <!-- PHOTO -->
+          <!-- PHOTO (RIGHT SIDE, SAME ROW) -->
           <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input type="file" @change="onPhotoChange"
-              class="md:h-48 w-full border-2 border-dashed border-green-300 rounded-lg p-4" />
+            <input type="file" @change="onPhotoChange" class="md:h-48 w-full border-2 border-dashed border-green-300 rounded-lg p-4" /> 
             <img v-if="photoPreview" :src="photoPreview" class="md:h-40 mt-4 ml-2 rounded border" />
           </div>
 
-          <button class="btn-primary w-full col-span-2" :disabled="loading">
+          <!-- SAVE -->
+          <button class="btn-primary w-full md:col-span-2" :disabled="loading">
             {{ loading ? 'Saving...' : 'Save Student' }}
           </button>
+
 
         </div>
       </form>
     </div>
   </HeadmasterLayout>
 </template>
+
 
 <style scoped>
 .input {
