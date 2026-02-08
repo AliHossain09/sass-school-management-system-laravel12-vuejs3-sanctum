@@ -1,9 +1,11 @@
 <script setup>
 import TeacherLayout from '../../layouts/TeacherLayout.vue'
+import EventCalendar from '../../components/HeadmasterMenu/events/EventCalendar.vue'
 </script>
 
 <template>
   <TeacherLayout>
+    <EventCalendar />
     <h1 class="text-2xl font-bold mb-6">Dashboard</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ">
@@ -73,5 +75,5 @@ import TeacherLayout from '../../layouts/TeacherLayout.vue'
         <p class="text-3xl font-bold">240</p>
       </div>
     </div>
-  </TeacherLayout> >
+  </TeacherLayout>
 </template>

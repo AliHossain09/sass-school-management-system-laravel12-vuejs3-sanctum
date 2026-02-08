@@ -26,6 +26,8 @@ import TeacherAttendance from '../components/HeadmasterMenu/teacher/TeacherAtten
 import NoticeList from '../components/HeadmasterMenu/notices/NoticeList.vue';
 //events
 import EventsList from '../components/HeadmasterMenu/events/EventList.vue';
+import TeacherEventsCalender from '../Pages/teacher/TeacherEvents.vue';
+import StudentEventsCalender from '../Pages/student/StudentEvents.vue';
 //AcademicYear
 import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear.vue';
 
@@ -75,6 +77,29 @@ const routes = [
   { path: '/notices', component: NoticeList, beforeEnter: requireAuth },
   //Events
   { path: '/events-list', component: EventsList, beforeEnter: requireAuth },
+  { path: '/events-calender-teacher', component: TeacherEventsCalender, beforeEnter: requireAuth },
+  { path: '/events-calender-student', component: StudentEventsCalender, beforeEnter: requireAuth },
+
+
+//   {
+//   path: '/events-list',
+//   component: () => {
+//     const role = localStorage.getItem('role')
+
+//     if (role === 'headmaster') {
+//       return import('../components/HeadmasterMenu/events/EventList.vue')
+//     }
+
+//     if (role === 'teacher') {
+//       return import('../Pages/teacher/TeacherEvents.vue')
+//     }
+
+//     return import('../Pages/student/StudentEvents.vue')
+//   },
+//   beforeEnter: requireAuth
+// },
+
+
   //AcademicYear
   { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
 

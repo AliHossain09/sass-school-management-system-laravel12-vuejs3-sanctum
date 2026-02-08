@@ -127,7 +127,7 @@ const logout = () => {
       </router-link>
 
       <!-- Events -->
-      <router-link to="/events-list" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+      <router-link to="/events-calender-student" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
         active-class="bg-indigo-600" @click="$emit('close')">
         <FaCalendar class="w-5 h-5 mr-2" />
         <span>Events</span>
