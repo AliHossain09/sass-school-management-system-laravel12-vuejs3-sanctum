@@ -27,11 +27,15 @@ const logout = () => {
   <!-- Overlay -->
   <div v-if="isOpen" class="fixed inset-0 bg-black/40 z-40 xl:hidden" @click="$emit('close')"></div>
 
-  <aside class="bg-blue-900 text-white w-64 p-4 flex flex-col justify-start xl:justify-between
-           fixed xl:static z-50 h-screen transition-transform duration-300" :class="{
-            '-translate-x-full xl:translate-x-0': !isOpen,
-            'translate-x-0': isOpen
-          }">
+  <aside class="bg-blue-900 text-white w-64 flex flex-col
+         fixed top-16 left-0 z-50
+         h-[calc(100vh-4rem)]
+         transition-transform duration-300
+         overflow-y-auto" :class="{
+          '-translate-x-full xl:translate-x-0': !isOpen,
+          'translate-x-0': isOpen
+        }">
+
     <!-- Close (mobile) -->
     <button class="xl:hidden text-right text-xl mb-4" @click="$emit('close')">
       ✕
@@ -40,8 +44,8 @@ const logout = () => {
     <nav class="flex flex-col gap-2">
 
       <!-- Dashboard -->
-      <router-link to="/teacher-dashboard" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2" active-class="bg-indigo-600"
-        @click="$emit('close')">
+      <router-link to="/teacher-dashboard" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600" @click="$emit('close')">
         <FaSchool class="w-5 h-5 mr-2" />
         <span>Dashboard</span>
       </router-link>
@@ -71,7 +75,7 @@ const logout = () => {
       <!-- STUDENT INFO -->
       <button class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
         @click="showStudentMenu = !showStudentMenu">
-        
+
         <FaUserGraduate class="w-5 h-5 mr-2" />
         <span>Student Info</span>
         <span>{{ showStudentMenu ? '▲' : '▼' }}</span>
@@ -139,8 +143,8 @@ const logout = () => {
     </nav>
 
     <!-- LOGOUT -->
-    <button @click="logout" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded mt-6">
+    <!-- <button @click="logout" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded mt-6">
       Logout
-    </button>
+    </button> -->
   </aside>
 </template>
