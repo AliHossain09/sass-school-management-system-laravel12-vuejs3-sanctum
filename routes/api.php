@@ -22,7 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', fn (Request $request) => $request->user());
+
     Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events/calendar', [EventController::class, 'calendarEvents']);
     
     // Master Admin
     Route::middleware('role:master_admin')->group(function () {

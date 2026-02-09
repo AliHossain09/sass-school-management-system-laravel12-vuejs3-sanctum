@@ -2,32 +2,38 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
 {
-    
-     // LIST EVENTS (WITH SEARCH & PAGINATION)
-     
+    // LIST EVENTS (WITH SEARCH & PAGINATION)
+
     public function index(Request $request)
     {
         $search = $request->input('search', '');
-        $schoolId = $request->user()->school_id ?? $request->input('school_id'); // if logged-in user's have school_id 
+        $schoolId = $request->user()->school_id ?? $request->input('school_id'); // if logged-in user's have school_id
 
         $events = Event::query()
-            ->when($schoolId, fn($q) => $q->where('school_id', $schoolId))
-            ->when($search, fn($q) => $q->where('title', 'like', "%$search%"))
+            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
+            ->when($search, fn ($q) => $q->where('title', 'like', "%$search%"))
             ->orderBy('start_date', 'desc')
             ->paginate($request->input('per_page', 10));
 
         return response()->json($events);
     }
 
+    // Calendar only (NO pagination)
+    public function calendarEvents(Request $request)
+    {
+        return Event::where('school_id', $request->user()->school_id)
+            ->select('id', 'title', 'start_date', 'end_date')
+            ->get();
+    }
 
-     // CREATE NEW EVENT
+    // CREATE NEW EVENT
 
     public function store(Request $request)
     {
@@ -40,7 +46,7 @@ class EventController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()->first(),
             ], 422);
         }
 
@@ -58,9 +64,8 @@ class EventController extends Controller
         ], 201);
     }
 
-    
-     // UPDATE EVENT
-     
+    // UPDATE EVENT
+
     public function update(Request $request, Event $event)
     {
         // Security: ensure same school
@@ -77,7 +82,7 @@ class EventController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => $validator->errors()->first(),
             ], 422);
         }
 
@@ -90,9 +95,8 @@ class EventController extends Controller
         ]);
     }
 
-    
     //  DELETE EVENT
-     
+
     public function destroy(Event $event)
     {
         // Security: ensure same school

@@ -12,13 +12,14 @@ const calendarOptions = ref({
 })
 
 const loadEvents = async () => {
-  const res = await axios.get('/api/events', {
+  const res = await axios.get('/api/events/calendar', {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`
     }
   })
 
-  calendarOptions.value.events = res.data.data.map(e => ({
+  // FIX HERE
+  calendarOptions.value.events = res.data.map(e => ({
     title: e.title,
     start: e.start_date,
     end: e.end_date

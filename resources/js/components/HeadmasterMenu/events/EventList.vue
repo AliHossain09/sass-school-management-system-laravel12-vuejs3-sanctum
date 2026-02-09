@@ -13,7 +13,7 @@ import { useToast } from 'vue-toastification'
 const toast = useToast()
 
 /* ================= STATE ================= */
-const events = ref<any[]>([])
+const events = ref<any[]>([]) // TABLE events
 const loading = ref(false)
 const activeForm = ref(false)
 const isEdit = ref(false)
@@ -50,8 +50,8 @@ const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,
 })
 
-/* ================= LOAD EVENTS (SERVER PAGINATION) ================= */
-const loadEvents = async (page = 1) => {
+/* ================= TABLE EVENTS ================= */
+const loadTableEvents = async (page = 1) => {
   loading.value = true
   try {
     const res = await axios.get('/api/events', {
@@ -62,10 +62,8 @@ const loadEvents = async (page = 1) => {
       },
     })
 
-    // table data
     events.value = res.data.data
 
-    // pagination meta (Laravel default)
     meta.value = {
       current_page: res.data.current_page,
       from: res.data.from,
@@ -74,28 +72,43 @@ const loadEvents = async (page = 1) => {
       last_page: res.data.last_page,
       per_page: res.data.per_page,
     }
-
-    // calendar data
-    calendarOptions.value.events = events.value.map(e => ({
-      id: e.id,
-      title: e.title,
-      start: e.start_date ?? undefined,
-      end: e.end_date ?? undefined,
-    }))
   } catch (err: any) {
-    console.error('EVENT LOAD ERROR:', err)
     toast.error(err?.response?.data?.message || 'Failed to load events')
   } finally {
     loading.value = false
   }
 }
 
-onMounted(() => loadEvents())
+/* ================= CALENDAR EVENTS ================= */
+const loadCalendarEvents = async () => {
+  try {
+    const res = await axios.get('/api/events/calendar', {
+      headers: authHeader(),
+    })
+
+    calendarOptions.value.events = res.data.map((e: any) => ({
+      id: e.id,
+      title: e.title,
+      start: e.start_date,
+      end: e.end_date,
+    }))
+  } catch (err: any) {
+    toast.error('Failed to load calendar events')
+  }
+}
+
+/* ================= INIT ================= */
+onMounted(() => {
+  loadTableEvents()
+  loadCalendarEvents()
+})
 
 /* ================= SEARCH DEBOUNCE ================= */
 watch(search, () => {
   clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => loadEvents(1), 400)
+  searchTimeout = setTimeout(() => {
+    loadTableEvents(1)
+  }, 400)
 })
 
 /* ================= FORM ================= */
@@ -134,9 +147,9 @@ const submit = async () => {
     }
 
     activeForm.value = false
-    loadEvents(meta.value.current_page)
+    loadTableEvents(meta.value.current_page)
+    loadCalendarEvents()
   } catch (err: any) {
-    console.error(err)
     toast.error(err?.response?.data?.message || 'Action failed')
   } finally {
     loading.value = false
@@ -157,22 +170,25 @@ const deleteEvent = async (id: number) => {
   toast.success('Deleted')
 
   if (events.value.length === 1 && meta.value.current_page > 1) {
-    loadEvents(meta.value.current_page - 1)
+    loadTableEvents(meta.value.current_page - 1)
   } else {
-    loadEvents(meta.value.current_page)
+    loadTableEvents(meta.value.current_page)
   }
+
+  loadCalendarEvents()
 }
 </script>
+
 
 <template>
   <HeadmasterLayout>
 
-     <!-- Breadcrumb -->
-        <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2">
-            <p class="text-gray-700">Headmaster ></p>
-            <p class="text-gray-700">Events ></p>
-            <p class="text-gray-700">List</p>
-        </div>
+    <!-- Breadcrumb -->
+    <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2">
+      <p class="text-gray-700">Headmaster ></p>
+      <p class="text-gray-700">Events ></p>
+      <p class="text-gray-700">List</p>
+    </div>
 
     <!-- Header -->
     <div class="flex justify-between items-center mb-6 bg-white p-4 shadow rounded">
@@ -188,47 +204,47 @@ const deleteEvent = async (id: number) => {
 
       <div class="bg-white shadow-md rounded p-4 self-start">
         <div>
-        <!-- Search -->
-        <div class="mb-3 flex justify-center">
-          <input v-model="search" placeholder="Search event..."
-            class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none" />
+          <!-- Search -->
+          <div class="mb-3 flex justify-center">
+            <input v-model="search" placeholder="Search event..."
+              class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none" />
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-blue-200 text-blue-700">
+                <tr>
+                  <th class="p-3 text-left">Title</th>
+                  <th class="p-3">From</th>
+                  <th class="p-3">To</th>
+                  <th class="p-3 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(e, index) in events" :key="e.id" :class="[
+                  index % 2 === 0 ? 'bg-white' : 'bg-gray-200',
+                  'hover:bg-blue-400 hover:text-white'
+                ]">
+                  <td class="p-3">{{ e.title }}</td>
+                  <td class="p-3 text-center">{{ e.start_date }}</td>
+                  <td class="p-3 text-center">{{ e.end_date }}</td>
+                  <td class="p-3 text-center space-x-2">
+                    <button @click="openEdit(e)" class="bg-blue-600 text-white px-3 py-1 rounded">Edit</button>
+                    <button @click="deleteEvent(e.id)" class="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+                  </td>
+                </tr>
+
+                <tr v-if="events.length === 0">
+                  <td colspan="4" class="text-center py-6 text-gray-500">
+                    No events found
+                  </td>
+                </tr>
+              </tbody>
+
+            </table>
+          </div>
         </div>
-
-        <!-- Table -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full text-sm">
-            <thead class="bg-blue-200 text-blue-700">
-              <tr>
-                <th class="p-3 text-left">Title</th>
-                <th class="p-3">From</th>
-                <th class="p-3">To</th>
-                <th class="p-3 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(e, index) in events" :key="e.id" :class="[
-                index % 2 === 0 ? 'bg-white' : 'bg-gray-200',
-                'hover:bg-blue-400 hover:text-white'
-              ]">
-                <td class="p-3">{{ e.title }}</td>
-                <td class="p-3 text-center">{{ e.start_date }}</td>
-                <td class="p-3 text-center">{{ e.end_date }}</td>
-                <td class="p-3 text-center space-x-2">
-                  <button @click="openEdit(e)" class="bg-blue-600 text-white px-3 py-1 rounded">Edit</button>
-                  <button @click="deleteEvent(e.id)" class="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
-                </td>
-              </tr>
-
-              <tr v-if="events.length === 0">
-                <td colspan="4" class="text-center py-6 text-gray-500">
-                  No events found
-                </td>
-              </tr>
-            </tbody>
-
-          </table>
-        </div>
-      </div>
 
         <!-- Pagination -->
         <div class="flex justify-between items-center mt-4">
