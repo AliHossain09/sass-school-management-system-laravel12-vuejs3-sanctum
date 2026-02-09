@@ -4,6 +4,7 @@ import Register from '../Pages/Register.vue';
 
 //.................................Mater Admin Dashboard....................................
 import MasterDashboard from '../Pages/dashboard/MasterDashboard.vue';
+//Create school
 import ManageSchools from '../components/MasterAdminMenu/ManageSchools.vue';
 
 //.................................HeadMater Admin Dashboard................................
@@ -26,17 +27,19 @@ import TeacherAttendance from '../components/HeadmasterMenu/teacher/TeacherAtten
 import NoticeList from '../components/HeadmasterMenu/notices/NoticeList.vue';
 //events
 import EventsList from '../components/HeadmasterMenu/events/EventList.vue';
-import TeacherEventsCalender from '../Pages/teacher/TeacherEvents.vue';
-import StudentEventsCalender from '../Pages/student/StudentEvents.vue';
 //AcademicYear
 import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear.vue';
 
 
 //.................................Teacher Dashboard.......................................
 import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
+//events
+import TeacherEventsCalender from '../components/TeacherMenu/events/TeacherEvents.vue';
 
 //.................................Student Dashboard.......................................
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
+//events
+import StudentEventsCalender from '../components/StudentMenu/events/StudentEvents.vue';
 
 
 import axios from 'axios';
@@ -77,37 +80,16 @@ const routes = [
   { path: '/notices', component: NoticeList, beforeEnter: requireAuth },
   //Events
   { path: '/events-list', component: EventsList, beforeEnter: requireAuth },
-  { path: '/events-calender-teacher', component: TeacherEventsCalender, beforeEnter: requireAuth },
-  { path: '/events-calender-student', component: StudentEventsCalender, beforeEnter: requireAuth },
-
-
-//   {
-//   path: '/events-list',
-//   component: () => {
-//     const role = localStorage.getItem('role')
-
-//     if (role === 'headmaster') {
-//       return import('../components/HeadmasterMenu/events/EventList.vue')
-//     }
-
-//     if (role === 'teacher') {
-//       return import('../Pages/teacher/TeacherEvents.vue')
-//     }
-
-//     return import('../Pages/student/StudentEvents.vue')
-//   },
-//   beforeEnter: requireAuth
-// },
-
-
   //AcademicYear
   { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
-
+  
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
-
+  { path: '/events-calender-teacher', component: TeacherEventsCalender, beforeEnter: requireAuth },
+  
   //.................................Student Dashboard........................................
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
+  { path: '/events-calender-student', component: StudentEventsCalender, beforeEnter: requireAuth },
 
 
 ]

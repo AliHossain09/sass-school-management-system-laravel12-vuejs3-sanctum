@@ -19,21 +19,22 @@ Route::post('/register', [AuthController::class, 'register']);
 
 // Protected
 Route::middleware('auth:sanctum')->group(function () {
-
+    
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', fn (Request $request) => $request->user());
-
+    Route::get('/events', [EventController::class, 'index']);
+    
     // Master Admin
     Route::middleware('role:master_admin')->group(function () {
         Route::get('/schools', [MasterAdminController::class, 'schools']);
         Route::post('/schools', [MasterAdminController::class, 'createSchool']);
         Route::put('/schools/{school}', [MasterAdminController::class, 'updateSchool']);
         Route::delete('/schools/{school}', [MasterAdminController::class, 'deleteSchool']);
-    });
-
-    // Headmaster
-    Route::middleware('role:headmaster')->group(function () {
-        // Class Management
+        });
+        
+        // Headmaster
+        Route::middleware('role:headmaster')->group(function () {
+            // Class Management
         Route::get('/classes', [ClassController::class, 'index']);
         Route::post('/classes', [ClassController::class, 'store']);
         Route::put('/classes/{schoolClass}', [ClassController::class, 'update']);
@@ -72,7 +73,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/notices/{notice}', [NoticeController::class, 'destroy']);
 
         // Events Management
-        Route::get('/events', [EventController::class, 'index']);
         Route::post('/events', [EventController::class, 'store']);
         Route::put('/events/{event}', [EventController::class, 'update']);
         Route::delete('/events/{event}', [EventController::class, 'destroy']);
