@@ -35,11 +35,15 @@ import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear
 import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
 //events
 import TeacherEventsCalender from '../components/TeacherMenu/events/TeacherEvents.vue';
+//notices
+import TeacherNotice from '../components/TeacherMenu/notice/TeacherNotice.vue';
 
 //.................................Student Dashboard.......................................
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
 //events
 import StudentEventsCalender from '../components/StudentMenu/events/StudentEvents.vue';
+//notices
+import StudentNotice from '../components/StudentMenu/notice/StudentNotice.vue';
 
 
 import axios from 'axios';
@@ -86,10 +90,12 @@ const routes = [
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
   { path: '/events-calender-teacher', component: TeacherEventsCalender, beforeEnter: requireAuth },
+  { path: '/notices-teacher', component: TeacherNotice, beforeEnter: requireAuth },
   
   //.................................Student Dashboard........................................
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
   { path: '/events-calender-student', component: StudentEventsCalender, beforeEnter: requireAuth },
+  { path: '/notices-student', component: StudentNotice, beforeEnter: requireAuth },
 
 
 ]

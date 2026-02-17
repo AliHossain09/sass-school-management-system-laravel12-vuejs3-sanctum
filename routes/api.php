@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/calendar', [EventController::class, 'calendarEvents']);
+    // Everyone logged in can VIEW notices
+    Route::get('/notices', [NoticeController::class, 'index']);
 
     // Master Admin
     Route::middleware('role:master_admin')->group(function () {
@@ -92,7 +94,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/students/{student}', [StudentController::class, 'destroyStudent']);
 
         // Notices Management
-        Route::get('/notices', [NoticeController::class, 'index']);
         Route::post('/notices', [NoticeController::class, 'store']);
         Route::put('/notices/{notice}', [NoticeController::class, 'update']);
         Route::delete('/notices/{notice}', [NoticeController::class, 'destroy']);

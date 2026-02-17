@@ -7,10 +7,31 @@ use Illuminate\Http\Request;
 
 class NoticeController extends Controller
 {
-      // List / Pagination
+    // List / Pagination
     public function index(Request $request)
     {
-        $query = Notice::where('school_id', auth()->user()->school_id);
+        $user = $request->user();
+
+        $query = Notice::where('school_id', $user->school_id);
+
+        // Role based filtering
+        if ($user->role === 'student') {
+
+            $student = $user->student;
+
+            $query->where(function ($q) use ($student) {
+                $q->where('type', 'all')
+                    ->orWhereJsonContains('class_ids', $student->class_id)
+                    ->orWhereJsonContains('section_ids', $student->section_id);
+            });
+        }
+
+        if ($user->role === 'teacher') {
+            $query->where(function ($q) {
+                $q->where('type', 'all')
+                    ->orWhereNotNull('class_ids');
+            });
+        }
 
         if ($request->has('search')) {
             $query->where('title', 'like', '%'.$request->search.'%');
@@ -71,7 +92,7 @@ class NoticeController extends Controller
         ]);
 
         $notice->update(array_filter($request->only([
-            'title','type','publish_date','class_ids','section_ids','description'
+            'title', 'type', 'publish_date', 'class_ids', 'section_ids', 'description',
         ])));
 
         return response()->json([
