@@ -220,7 +220,7 @@ const deleteRoutine = async (id: number) => {
 
                 <tbody>
                     <tr v-for="(r, index) in routines" :key="r.id"
-                        :class="[index % 2 === 0 ? 'bg-white' : 'bg-gray-100', 'border-b']">
+                        :class="[index % 2 === 0 ? 'bg-white' : 'bg-gray-200']">
                         <td class="px-4 py-2">{{ r.school_class?.name }}</td>
                         <td class="px-4 py-2">{{ r.section?.name }}</td>
                         <td class="px-4 py-2">{{ r.subject?.name }}</td>
