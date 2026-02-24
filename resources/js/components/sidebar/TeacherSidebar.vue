@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { FaArchway, FaSchool, FaUserGraduate, FaUserTie, FaBorderAll } from 'vue-icons-plus/fa'
-import { FaAddressBook, FaCalendar } from 'vue-icons-plus/fa'
+import { FaAddressBook, FaCalendar, FaWpforms } from 'vue-icons-plus/fa'
 
 defineProps({
   isOpen: Boolean
@@ -118,6 +118,15 @@ const logout = () => {
           Teacher Attendance
         </router-link>
       </div>
+
+      <router-link
+        to="/routine-teacher"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+      >
+        <FaWpforms class="w-5 h-5" />
+        Routine
+      </router-link>
 
       <!-- Notices -->
       <router-link to="/notices-teacher" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"

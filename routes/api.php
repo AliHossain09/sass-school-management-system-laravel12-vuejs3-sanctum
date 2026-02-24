@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\Api\AcademicYearController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NoticeController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassController;
 use App\Http\Controllers\Api\EventController;
-use App\Http\Controllers\Api\MasterAdminController;
 use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherController;
-use App\Http\Controllers\NoticeController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\MasterAdminController;
+use App\Http\Controllers\Api\AcademicYearController;
+use App\Http\Controllers\Api\ClassRoutineController;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
@@ -48,8 +49,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/calendar', [EventController::class, 'calendarEvents']);
-    // Everyone logged in can VIEW notices
+    // Everyone logged in can VIEW notices index route with optional filters
     Route::get('/notices', [NoticeController::class, 'index']);
+    //ClassRoutineController index route with optional filters
+    Route::get('/class-routines', [ClassRoutineController::class, 'index']);
+    
 
     // Master Admin
     Route::middleware('role:master_admin')->group(function () {
@@ -93,6 +97,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/students/{student}', [StudentController::class, 'updateStudent']);
         Route::delete('/students/{student}', [StudentController::class, 'destroyStudent']);
 
+        // ClassRoutineController Management
+        Route::post('/class-routines', [ClassRoutineController::class, 'store']);
+        Route::put('/class-routines/{classRoutine}', [ClassRoutineController::class, 'update']);
+        Route::delete('/class-routines/{classRoutine}', [ClassRoutineController::class, 'destroy']);
+        
         // Notices Management
         Route::post('/notices', [NoticeController::class, 'store']);
         Route::put('/notices/{notice}', [NoticeController::class, 'update']);

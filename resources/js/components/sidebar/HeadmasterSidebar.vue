@@ -9,7 +9,8 @@ import {
   FaBorderAll,
   FaAddressBook,
   FaCalendar,
-  FaRegCommentDots
+  FaRegCommentDots,
+  FaWpforms
 } from 'vue-icons-plus/fa'
 
 defineProps({
@@ -135,6 +136,15 @@ const logout = () => {
         <router-link to="/teachers-add" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded">Add Teacher</router-link>
         <router-link to="/teacher-attendance" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded">Teacher Attendance</router-link>
       </div>
+
+       <router-link
+        to="/class-routine"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+      >
+        <FaWpforms class="w-5 h-5" />
+        Routine
+      </router-link>
 
       <router-link
         to="/notices"

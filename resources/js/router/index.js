@@ -29,6 +29,8 @@ import NoticeList from '../components/HeadmasterMenu/notices/NoticeList.vue';
 import EventsList from '../components/HeadmasterMenu/events/EventList.vue';
 //AcademicYear
 import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear.vue';
+//Class Routine
+import ClassRoutine from '../components/HeadmasterMenu/routine/ClassRoutineList.vue';
 
 
 //.................................Teacher Dashboard.......................................
@@ -37,6 +39,8 @@ import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
 import TeacherEventsCalender from '../components/TeacherMenu/events/TeacherEvents.vue';
 //notices
 import TeacherNotice from '../components/TeacherMenu/notice/TeacherNotice.vue';
+//Routine
+import TeacherRoutine from '../components/TeacherMenu/routine/TeacherRoutine.vue';
 
 //.................................Student Dashboard.......................................
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
@@ -44,6 +48,8 @@ import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
 import StudentEventsCalender from '../components/StudentMenu/events/StudentEvents.vue';
 //notices
 import StudentNotice from '../components/StudentMenu/notice/StudentNotice.vue';
+//Routine
+import StudentRoutine from '../components/StudentMenu/routine/StudentRoutine.vue';
 
 
 import axios from 'axios';
@@ -86,16 +92,20 @@ const routes = [
   { path: '/events-list', component: EventsList, beforeEnter: requireAuth },
   //AcademicYear
   { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
+  //Class Routine
+  { path: '/class-routine', component: ClassRoutine, beforeEnter: requireAuth },
   
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
   { path: '/events-calender-teacher', component: TeacherEventsCalender, beforeEnter: requireAuth },
   { path: '/notices-teacher', component: TeacherNotice, beforeEnter: requireAuth },
-  
+  { path: '/routine-teacher', component: TeacherRoutine, beforeEnter: requireAuth },
+
   //.................................Student Dashboard........................................
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },
   { path: '/events-calender-student', component: StudentEventsCalender, beforeEnter: requireAuth },
   { path: '/notices-student', component: StudentNotice, beforeEnter: requireAuth },
+  { path: '/routine-student', component: StudentRoutine, beforeEnter: requireAuth },
 
 
 ]
