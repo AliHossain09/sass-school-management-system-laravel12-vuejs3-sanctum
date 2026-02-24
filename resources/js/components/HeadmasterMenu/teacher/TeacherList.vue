@@ -139,9 +139,9 @@ const submit = async () => {
         loading.value = true
         if (editingTeacher.value) {
             await axios.post(`/api/teachers/${editingTeacher.value.id}`, data, {
-    headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' },
-    params: { _method: 'PUT' }
-})
+                headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' },
+                params: { _method: 'PUT' }
+            })
 
             toast.success('Teacher updated successfully!')
         } else {
@@ -215,12 +215,8 @@ const deleteTeacher = async (id: number) => {
 
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold mb-1">Teacher List</h1>
-                <input
-                    v-model="search"
-                    type="text"
-                    placeholder="Search by name, email or phone..."
-                    class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none"
-                />
+                <input v-model="search" type="text" placeholder="Search by name, email or phone..."
+                    class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none" />
                 <button @click="openForm"
                     class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
                     Create Teacher
@@ -243,8 +239,11 @@ const deleteTeacher = async (id: number) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(teacher, index) in teachers" :key="teacher.id"
-                            class="border-b last:border-b-0 hover:bg-gray-50">
+                        <tr v-for="(teacher, index) in teachers" :key="teacher.id" :class="[
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-200', // Alternate row color
+                            'last:border-b-0',
+                            'hover:bg-gray-50'
+                        ]">
                             <td class="px-4 py-3">{{ index + 1 + (meta.current_page - 1) * meta.per_page }}</td>
 
                             <td class="px-4 py-3">
@@ -259,6 +258,7 @@ const deleteTeacher = async (id: number) => {
                             <td class="px-4 py-3">{{ teacher.department || 'N/A' }}</td>
                             <td class="px-4 py-3">{{ teacher.phone || 'N/A' }}</td>
                             <td class="px-4 py-3">{{ teacher.email || 'N/A' }}</td>
+
                             <td class="px-4 py-3 flex justify-center gap-2">
                                 <button @click="startEdit(teacher)"
                                     class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
@@ -266,6 +266,7 @@ const deleteTeacher = async (id: number) => {
                                     class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
                             </td>
                         </tr>
+
                     </tbody>
 
                 </table>
@@ -278,8 +279,9 @@ const deleteTeacher = async (id: number) => {
                         class="px-2 py-1 border rounded disabled:opacity-50">&laquo;</button>
                     <button v-for="page in meta.last_page" :key="page" @click="loadTeachers(page)"
                         :class="['px-2 py-1 border rounded', page === meta.current_page ? 'bg-blue-600 text-white' : '']">{{
-                        page }}</button>
-                    <button :disabled="meta.current_page === meta.last_page" @click="loadTeachers(meta.current_page + 1)"
+                            page }}</button>
+                    <button :disabled="meta.current_page === meta.last_page"
+                        @click="loadTeachers(meta.current_page + 1)"
                         class="px-2 py-1 border rounded disabled:opacity-50">&raquo;</button>
                 </div>
             </div>
