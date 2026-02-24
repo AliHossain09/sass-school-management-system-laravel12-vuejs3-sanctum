@@ -190,15 +190,20 @@ const deleteSubject = async (id: number) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(subject, index) in subjects" :key="subject.id"
-                            class="border-b last:border-b-0 hover:bg-gray-50">
+                        <tr v-for="(subject, index) in subjects" :key="subject.id" :class="[
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-200', // Alternate row color
+                            'last:border-b-0',
+                            'hover:bg-gray-50'
+                        ]">
                             <td class="px-4 py-3">{{ index + 1 + (meta.current_page - 1) * meta.per_page }}</td>
                             <td class="px-4 py-3">{{ subject.name }}</td>
                             <td class="px-4 py-3">{{ subject.code || 'N/A' }}</td>
                             <td class="px-4 py-3">{{ subject.type }}</td>
                             <td class="px-4 py-3">{{ subject.school_class?.name || 'N/A' }}</td>
-                            <td class="px-4 py-3 text-black">{{ subject.teacher?.first_name ? subject.teacher.first_name
-                                + ' ' + subject.teacher.last_name : 'N/A' }}</td>
+                            <td class="px-4 py-3 text-black">
+                                {{ subject.teacher?.first_name ? subject.teacher.first_name + ' ' +
+                                subject.teacher.last_name : 'N/A' }}
+                            </td>
                             <td class="px-4 py-3 flex justify-center gap-2">
                                 <button @click="startEdit(subject)"
                                     class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
@@ -206,6 +211,7 @@ const deleteSubject = async (id: number) => {
                                     class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
                             </td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -218,7 +224,7 @@ const deleteSubject = async (id: number) => {
                         class="px-2 py-1 border rounded disabled:opacity-50">&laquo;</button>
                     <button v-for="page in meta.last_page" :key="page" @click="loadSubjects(page)"
                         :class="['px-2 py-1 border rounded', page === meta.current_page ? 'bg-blue-600 text-white' : '']">{{
-                        page }}</button>
+                            page }}</button>
                     <button :disabled="meta.current_page === meta.last_page"
                         @click="loadSubjects(meta.current_page + 1)"
                         class="px-2 py-1 border rounded disabled:opacity-50">&raquo;</button>
