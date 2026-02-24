@@ -140,6 +140,11 @@ const openForm = (routine: any = null) => {
     activeForm.value = true
 }
 
+const closeForm = () => {
+    activeForm.value = false
+    resetForm()
+}
+
 const submit = async () => {
     if (!form.value.class_id || !form.value.section_id || !form.value.subject_id) {
         toast.error('Class, Section & Subject required')
@@ -214,7 +219,8 @@ const deleteRoutine = async (id: number) => {
                 </thead>
 
                 <tbody>
-                    <tr v-for="r in routines" :key="r.id" class="border-b">
+                    <tr v-for="(r, index) in routines" :key="r.id"
+                        :class="[index % 2 === 0 ? 'bg-white' : 'bg-gray-100', 'border-b']">
                         <td class="px-4 py-2">{{ r.school_class?.name }}</td>
                         <td class="px-4 py-2">{{ r.section?.name }}</td>
                         <td class="px-4 py-2">{{ r.subject?.name }}</td>
@@ -234,61 +240,116 @@ const deleteRoutine = async (id: number) => {
         </div>
 
         <!-- Modal -->
-        <div v-if="activeForm" class="fixed inset-0 bg-black/40 flex items-center justify-center">
-            <div class="bg-white p-6 rounded w-full max-w-2xl">
+        <div v-if="activeForm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded w-full max-w-2xl relative">
+                <!-- Close Button -->
+                <button @click="closeForm"
+                    class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">
+                    &times;
+                </button>
+
                 <h3 class="text-xl font-semibold mb-4">
                     {{ editingRoutine ? 'Edit Routine' : 'Create Routine' }}
                 </h3>
 
-                <form @submit.prevent="submit" class="grid grid-cols-2 gap-4">
+                <form @submit.prevent="submit" class="bg-white shadow-md rounded-lg p-6 space-y-6">
 
-                    <select v-model="form.class_id" class="input">
-                        <option value="">Select Class</option>
-                        <option v-for="c in classes" :value="c.id">{{ c.name }}</option>
-                    </select>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    <select v-model="form.section_id" class="input">
-                        <option value="">Select Section</option>
-                        <option v-for="s in sections" :value="s.id">{{ s.name }}</option>
-                    </select>
-
-                    <select v-model="form.subject_id" class="input">
-                        <option value="">Select Subject</option>
-                        <option v-for="s in subjects" :value="s.id">{{ s.name }}</option>
-                    </select>
-
-                    <select v-model="form.teacher_id" class="input">
-                        <option value="">Select Teacher</option>
-                        <option v-for="t in teachers" :value="t.id">
-                            {{ t.first_name }} {{ t.last_name }}
-                        </option>
-                    </select>
-
-                    <input type="time" v-model="form.start_time" class="input" />
-                    <input type="time" v-model="form.end_time" class="input" />
-
-                    <input v-model="form.class_room" placeholder="Class Room" class="input col-span-2" />
-
-                    <!-- Days -->
-                    <div class="col-span-2">
-                        <label class="block mb-2 font-medium">Select Days *</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <label v-for="day in days" :key="day" class="flex items-center gap-2">
-                                <input type="checkbox" :value="day" v-model="form.other_days" />
-                                <span>{{ day }}</span>
-                            </label>
+                        <!-- Class -->
+                        <div>
+                            <label class="block mb-1 font-medium text-gray-700">Class *</label>
+                            <select v-model="form.class_id"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Class</option>
+                                <option v-for="cls in classes" :key="cls.id" :value="cls.id">{{ cls.name }}</option>
+                            </select>
                         </div>
+
+                        <!-- Section -->
+                        <div>
+                            <label class="block mb-1 font-medium text-gray-700">Section *</label>
+                            <select v-model="form.section_id"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Section</option>
+                                <option v-for="s in sections" :key="s.id" :value="s.id">{{ s.name }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Subject -->
+                        <div>
+                            <label class="block mb-1 font-medium text-gray-700">Subject *</label>
+                            <select v-model="form.subject_id"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Subject</option>
+                                <option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Teacher -->
+                        <div>
+                            <label class="block mb-1 font-medium text-gray-700">Teacher</label>
+                            <select v-model="form.teacher_id"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select Teacher</option>
+                                <option v-for="t in teachers" :key="t.id" :value="t.id">
+                                    {{ t.first_name }} {{ t.last_name }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Start Time -->
+                        <div>
+                            <label class="block mb-1 font-medium text-gray-700">Start Time *</label>
+                            <input type="time" v-model="form.start_time"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+
+                        <!-- End Time -->
+                        <div>
+                            <label class="block mb-1 font-medium text-gray-700">End Time *</label>
+                            <input type="time" v-model="form.end_time"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+
+                        <!-- Class Room -->
+                        <div class="md:col-span-2">
+                            <label class="block mb-1 font-medium text-gray-700">Class Room</label>
+                            <input v-model="form.class_room" placeholder="Class Room"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+
+                        <!-- Days -->
+                        <div class="md:col-span-2">
+                            <label class="block mb-1 font-medium text-gray-700">Select Days *</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <label v-for="day in days" :key="day" class="flex items-center gap-2">
+                                    <input type="checkbox" :value="day" v-model="form.other_days"
+                                        class="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500" />
+                                    <span class="text-gray-700">{{ day }}</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Is Break -->
+                        <div class="md:col-span-2 flex items-center gap-2">
+                            <input type="checkbox" v-model="form.is_break"
+                                class="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500" />
+                            <label class="font-medium text-gray-700">Is Break</label>
+                        </div>
+
                     </div>
 
-                    <div class="col-span-2 flex items-center gap-2">
-                        <input type="checkbox" v-model="form.is_break" />
-                        <label>Is Break</label>
-                    </div>
-
-                    <button type="submit" class="bg-blue-600 text-white py-2 rounded col-span-2">
-                        {{ editingRoutine ? 'Update' : 'Save' }}
+                    <!-- Submit Button -->
+                    <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md font-medium transition duration-200"
+                        :disabled="loading">
+                        {{ editingRoutine ? 'Update Routine' : loading ? 'Saving...' : 'Save Routine' }}
                     </button>
+
                 </form>
+
+
             </div>
         </div>
 
