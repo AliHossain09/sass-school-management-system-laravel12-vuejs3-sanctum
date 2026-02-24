@@ -70,7 +70,7 @@ const loadSections = async (page = 1) => {
         })
         sections.value = res.data.data
         meta.value = res.data.meta
-    } catch (err:any) {
+    } catch (err: any) {
         toast.error(err.response?.data?.message || 'Failed to load sections')
     } finally {
         loading.value = false
@@ -135,7 +135,7 @@ const submit = async () => {
         activeForm.value = false
         loadSections(meta.value.current_page)
 
-    } catch (err:any) {
+    } catch (err: any) {
         toast.error(err.response?.data?.message || 'Failed to save section')
     } finally {
         loading.value = false
@@ -178,7 +178,7 @@ const deleteSection = async (id: number) => {
         } else {
             loadSections(meta.value.current_page)
         }
-    } catch (err:any) {
+    } catch (err: any) {
         toast.error(err.response?.data?.message || 'Failed to delete section')
     } finally {
         loading.value = false
@@ -225,8 +225,11 @@ const deleteSection = async (id: number) => {
                     </thead>
 
                     <tbody>
-                        <tr v-for="(s, index) in sections" :key="s.id"
-                            class="border-b last:border-b-0 hover:bg-gray-50">
+                        <tr v-for="(s, index) in sections" :key="s.id" :class="[
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-200', // Alternate color
+                            'last:border-b-0',
+                            'hover:bg-gray-50'
+                        ]">
                             <td class="px-4 py-3">
                                 {{ index + 1 + (meta.current_page - 1) * meta.per_page }}
                             </td>
@@ -244,6 +247,7 @@ const deleteSection = async (id: number) => {
                                 </button>
                             </td>
                         </tr>
+
                     </tbody>
                 </table>
             </div>
