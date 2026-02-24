@@ -220,149 +220,156 @@ const deleteStudent = async (id: number) => {
 </script>
 
 <template>
-<HeadmasterLayout>
-    <!-- Breadcrumb -->
-    <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2">
-        <p class="text-gray-700">Headmaster ></p>
-        <p class="text-gray-700">Students ></p>
-        <p class="text-gray-700">List</p>
-    </div>
-
-    <div class="p-6 shadow-2xl bg-gray-50 rounded">
-
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold mb-1">Student List</h1>
-            <input
-                v-model="search"
-                type="text"
-                placeholder="Search by name, email, or phone..."
-                class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none"
-            />
-            <button @click="openForm"
-                class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
-                Create Student
-            </button>
+    <HeadmasterLayout>
+        <!-- Breadcrumb -->
+        <div class="flex shadow-xl rounded mb-6 p-4 bg-white gap-2">
+            <p class="text-gray-700">Headmaster ></p>
+            <p class="text-gray-700">Students ></p>
+            <p class="text-gray-700">List</p>
         </div>
 
-        <div class="overflow-x-auto rounded-lg bg-white shadow">
-            <table class="min-w-full table-auto text-left">
-                <thead class="bg-blue-200 text-blue-700">
-                    <tr>
-                        <th class="px-4 py-2">SL.</th>
-                        <th class="px-4 py-2">Photo</th>
-                        <th class="px-4 py-2">Name</th>
-                        <th class="px-4 py-2">Gender</th>
-                        <th class="px-4 py-2">Class</th>
-                        <th class="px-4 py-2">Phone</th>
-                        <th class="px-4 py-2">Email</th>
-                        <th class="px-4 py-2 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(student, index) in students" :key="student.id" class="border-b last:border-b-0 hover:bg-gray-50">
-                        <td class="px-4 py-3">{{ index + 1 + (meta.current_page - 1) * meta.per_page }}</td>
-                        <td class="px-4 py-3">
-                            <img v-if="student.photo" :src="`/storage/${student.photo}`" alt="Photo"
-                                 class="h-12 w-12 object-cover rounded-full"/>
-                            <span v-else class="text-gray-400">N/A</span>
-                        </td>
-                        <td class="px-4 py-3">{{ student.first_name }} {{ student.last_name }}</td>
-                        <td class="px-4 py-3">{{ student.gender }}</td>
-                        <td class="px-4 py-3">{{ student.class_id || 'N/A' }}</td>
-                        <td class="px-4 py-3">{{ student.phone || 'N/A' }}</td>
-                        <td class="px-4 py-3">{{ student.email || 'N/A' }}</td>
-                        <td class="px-4 py-3 flex justify-center gap-2">
-                            <button @click="startEdit(student)"
-                                class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
-                            <button @click="deleteStudent(student.id)"
-                                class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <div class="p-6 shadow-2xl bg-gray-50 rounded">
 
-        <div class="flex justify-between items-center mt-4">
-            <div class="text-gray-600">Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} entries</div>
-            <div class="flex gap-1">
-                <button :disabled="meta.current_page === 1" @click="loadStudents(meta.current_page - 1)"
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold mb-1">Student List</h1>
+                <input v-model="search" type="text" placeholder="Search by name, email, or phone..."
+                    class="border-b rounded-md border-blue-400 px-4 py-2 w-64 focus:outline-none" />
+                <button @click="openForm"
+                    class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 flex items-center gap-2">
+                    Create Student
+                </button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg bg-white shadow">
+                <table class="min-w-full table-auto text-left">
+                    <thead class="bg-blue-200 text-blue-700">
+                        <tr>
+                            <th class="px-4 py-2">SL.</th>
+                            <th class="px-4 py-2">Photo</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Gender</th>
+                            <th class="px-4 py-2">Class</th>
+                            <th class="px-4 py-2">Phone</th>
+                            <th class="px-4 py-2">Email</th>
+                            <th class="px-4 py-2 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(student, index) in students" :key="student.id" :class="[
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-200', // Alternate row color
+                            'last:border-b-0',
+                            'hover:bg-gray-50'
+                        ]">
+                            <td class="px-4 py-3">{{ index + 1 + (meta.current_page - 1) * meta.per_page }}</td>
+
+                            <td class="px-4 py-3">
+                                <img v-if="student.photo" :src="`/storage/${student.photo}`" alt="Photo"
+                                    class="h-12 w-12 object-cover rounded-full" />
+                                <span v-else class="text-gray-400">N/A</span>
+                            </td>
+
+                            <td class="px-4 py-3">{{ student.first_name }} {{ student.last_name }}</td>
+                            <td class="px-4 py-3">{{ student.gender }}</td>
+                            <td class="px-4 py-3">{{ student.class_id || 'N/A' }}</td>
+                            <td class="px-4 py-3">{{ student.phone || 'N/A' }}</td>
+                            <td class="px-4 py-3">{{ student.email || 'N/A' }}</td>
+
+                            <td class="px-4 py-3 flex justify-center gap-2">
+                                <button @click="startEdit(student)"
+                                    class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Edit</button>
+                                <button @click="deleteStudent(student.id)"
+                                    class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Delete</button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center mt-4">
+                <div class="text-gray-600">Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} entries</div>
+                <div class="flex gap-1">
+                    <button :disabled="meta.current_page === 1" @click="loadStudents(meta.current_page - 1)"
                         class="px-2 py-1 border rounded disabled:opacity-50">&laquo;</button>
-                <button v-for="page in meta.last_page" :key="page" @click="loadStudents(page)"
-                        :class="['px-2 py-1 border rounded', page === meta.current_page ? 'bg-blue-600 text-white' : '']">{{ page }}</button>
-                <button :disabled="meta.current_page === meta.last_page" @click="loadStudents(meta.current_page + 1)"
+                    <button v-for="page in meta.last_page" :key="page" @click="loadStudents(page)"
+                        :class="['px-2 py-1 border rounded', page === meta.current_page ? 'bg-blue-600 text-white' : '']">{{
+                        page }}</button>
+                    <button :disabled="meta.current_page === meta.last_page"
+                        @click="loadStudents(meta.current_page + 1)"
                         class="px-2 py-1 border rounded disabled:opacity-50">&raquo;</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Create/Edit Modal -->
-        <div v-if="activeForm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-            <div class="bg-white rounded p-6 w-full max-w-3xl shadow-lg relative overflow-y-auto max-h-[90vh]">
-                <button @click="activeForm = false"
+            <!-- Create/Edit Modal -->
+            <div v-if="activeForm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div class="bg-white rounded p-6 w-full max-w-3xl shadow-lg relative overflow-y-auto max-h-[90vh]">
+                    <button @click="activeForm = false"
                         class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
-                <h3 class="text-xl font-semibold mb-4">{{ editingStudent ? 'Edit Student' : 'Create Student' }}</h3>
-                <p v-if="error" class="text-red-600 mb-2">{{ error }}</p>
+                    <h3 class="text-xl font-semibold mb-4">{{ editingStudent ? 'Edit Student' : 'Create Student' }}</h3>
+                    <p v-if="error" class="text-red-600 mb-2">{{ error }}</p>
 
-                <form @submit.prevent="submit" class="space-y-4">
+                    <form @submit.prevent="submit" class="space-y-4">
 
-                    <!-- Basic Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-100 rounded shadow-sm">
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">First Name *</label>
-                            <input v-model="form.first_name" class="input" />
+                        <!-- Basic Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-100 rounded shadow-sm">
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">First Name *</label>
+                                <input v-model="form.first_name" class="input" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Last Name *</label>
+                                <input v-model="form.last_name" class="input" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Gender *</label>
+                                <select v-model="form.gender" class="input">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Date of Birth</label>
+                                <input type="date" v-model="form.dob" class="input" />
+                            </div>
+                            <div class="flex flex-col md:col-span-2">
+                                <label class="mb-1 font-medium text-gray-600">Photo</label>
+                                <input type="file" @change="onPhotoChange" accept="image/*"
+                                    class="h-40 border-2 border-dashed rounded-lg p-4" />
+                                <img v-if="photoPreview" :src="photoPreview" class="mt-2 h-32 w-32 rounded border" />
+                            </div>
                         </div>
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Last Name *</label>
-                            <input v-model="form.last_name" class="input" />
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Gender *</label>
-                            <select v-model="form.gender" class="input">
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Date of Birth</label>
-                            <input type="date" v-model="form.dob" class="input" />
-                        </div>
-                        <div class="flex flex-col md:col-span-2">
-                            <label class="mb-1 font-medium text-gray-600">Photo</label>
-                            <input type="file" @change="onPhotoChange" accept="image/*" class="h-40 border-2 border-dashed rounded-lg p-4"/>
-                            <img v-if="photoPreview" :src="photoPreview" class="mt-2 h-32 w-32 rounded border"/>
-                        </div>
-                    </div>
 
-                    <!-- Academic Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-100 rounded shadow-sm">
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Student Code</label>
-                            <input v-model="form.student_code" class="input"/>
+                        <!-- Academic Info -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-100 rounded shadow-sm">
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Student Code</label>
+                                <input v-model="form.student_code" class="input" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Academic Year</label>
+                                <input v-model="form.academic_year" class="input" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Class</label>
+                                <input v-model="form.class_id" class="input" />
+                            </div>
+                            <div class="flex flex-col">
+                                <label class="mb-1 font-medium text-gray-600">Section</label>
+                                <input v-model="form.section_id" class="input" />
+                            </div>
                         </div>
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Academic Year</label>
-                            <input v-model="form.academic_year" class="input"/>
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Class</label>
-                            <input v-model="form.class_id" class="input"/>
-                        </div>
-                        <div class="flex flex-col">
-                            <label class="mb-1 font-medium text-gray-600">Section</label>
-                            <input v-model="form.section_id" class="input"/>
-                        </div>
-                    </div>
 
-                    <button type="submit" class="btn-primary w-full" :disabled="loading">
-                        {{ loading ? 'Saving...' : editingStudent ? 'Update Student' : 'Save Student' }}
-                    </button>
-                </form>
+                        <button type="submit" class="btn-primary w-full" :disabled="loading">
+                            {{ loading ? 'Saving...' : editingStudent ? 'Update Student' : 'Save Student' }}
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-    </div>
-</HeadmasterLayout>
+        </div>
+    </HeadmasterLayout>
 </template>
 
 <style scoped>
@@ -372,6 +379,7 @@ const deleteStudent = async (id: number) => {
     border-radius: 4px;
     width: 100%;
 }
+
 .btn-primary {
     background-color: #2563eb;
     color: white;
@@ -380,6 +388,7 @@ const deleteStudent = async (id: number) => {
     cursor: pointer;
     border: none;
 }
+
 .btn-primary:disabled {
     background-color: #a5b4fc;
     cursor: not-allowed;
