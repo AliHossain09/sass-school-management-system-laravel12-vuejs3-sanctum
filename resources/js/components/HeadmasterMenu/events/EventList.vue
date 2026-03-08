@@ -253,19 +253,19 @@ const deleteEvent = async (id: number) => {
           </div>
 
           <div class="flex gap-1">
-            <button :disabled="meta.current_page === 1" @click="loadEvents(meta.current_page - 1)"
+            <button :disabled="meta.current_page === 1" @click="loadTableEvents(meta.current_page - 1)"
               class="px-2 py-1 border rounded disabled:opacity-50">
               &laquo;
             </button>
 
-            <button v-for="p in meta.last_page" :key="p" @click="loadEvents(p)" :class="[
+            <button v-for="p in meta.last_page" :key="p" @click="loadTableEvents(p)" :class="[
               'px-2 py-1 border rounded',
               p === meta.current_page ? 'bg-blue-600 text-white' : ''
             ]">
               {{ p }}
             </button>
 
-            <button :disabled="meta.current_page === meta.last_page" @click="loadEvents(meta.current_page + 1)"
+            <button :disabled="meta.current_page === meta.last_page" @click="loadTableEvents(meta.current_page + 1)"
               class="px-2 py-1 border rounded disabled:opacity-50">
               &raquo;
             </button>

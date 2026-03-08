@@ -155,7 +155,7 @@ const submit = async () => {
 
     const data = new FormData()
     Object.entries(form.value).forEach(([key, value]) => {
-        if (value !== null && value !== '') data.append(key, value)
+        if (value !== null && value !== '') data.append(key, String(value))
     })
 
     try {

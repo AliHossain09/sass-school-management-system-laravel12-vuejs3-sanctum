@@ -239,6 +239,41 @@ const deleteRoutine = async (id: number) => {
             </table>
         </div>
 
+        <!-- Pagination -->
+<div class="flex justify-end items-center mt-4 gap-2">
+  <!-- Previous -->
+  <button
+    @click="loadRoutines(meta.current_page - 1)"
+    :disabled="meta.current_page === 1 || loading"
+    class="px-3 py-1 bg-gray-300 rounded disabled:opacity-50 hover:bg-gray-400 transition"
+  >
+    Prev
+  </button>
+
+  <!-- Page Numbers -->
+  <button
+    v-for="page in meta.last_page"
+    :key="page"
+    @click="loadRoutines(page)"
+    :class="[
+      'px-3 py-1 rounded transition',
+      meta.current_page === page ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+    ]"
+  >
+    {{ page }}
+  </button>
+
+  <!-- Next -->
+  <button
+    @click="loadRoutines(meta.current_page + 1)"       
+    :disabled="meta.current_page === meta.last_page || loading"
+    class="px-3 py-1 bg-gray-300 rounded disabled:opacity-50 hover:bg-gray-400 transition"
+  >
+    Next
+  </button>
+</div>
+
+
         <!-- Modal -->
         <div v-if="activeForm" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div class="bg-white p-6 rounded w-full max-w-2xl relative">
