@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import StudentSidebar from '../components/sidebar/StudentSidebar.vue'
 import { BsPersonBoundingBox, BsBoxArrowLeft, BsChatDots, BsBell } from 'vue-icons-plus/bs'
@@ -9,7 +9,9 @@ const router = useRouter()
 
 const isSidebarOpen = ref(false)
 const isDropdownOpen = ref(false)
+const isNotificationOpen = ref(false)
 const selectedLanguage = ref('en')
+const notifications = ref([])
 
 // student info
 const user = ref({
@@ -26,13 +28,47 @@ const languages = [
   { code: 'es', label: 'Spanish' },
 ]
 
+const authHeader = () => ({
+  Authorization: `Bearer ${localStorage.getItem('token')}`,
+})
+
+const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length)
+
+const fetchNotifications = async () => {
+  try {
+    const res = await axios.get('/api/event-notifications', { headers: authHeader() })
+    notifications.value = res.data?.data || []
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const toggleNotifications = async () => {
+  isNotificationOpen.value = !isNotificationOpen.value
+  if (isNotificationOpen.value) {
+    await fetchNotifications()
+  }
+}
+
+const openEventFromNotification = async (notification) => {
+  try {
+    if (!notification.is_read) {
+      await axios.post(`/api/event-notifications/${notification.id}/read`, {}, { headers: authHeader() })
+      notification.is_read = true
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    isNotificationOpen.value = false
+    router.push('/events-calender-student')
+  }
+}
+
 // fetch logged-in student
 const fetchUser = async () => {
   try {
     const res = await axios.get('/api/user', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: authHeader(),
     })
 
     user.value.name = res.data.name
@@ -49,9 +85,7 @@ const fetchUser = async () => {
 const logout = async () => {
   try {
     await axios.post('/api/logout', {}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
+      headers: authHeader(),
     })
     localStorage.removeItem('token')
     router.push('/login')
@@ -60,7 +94,9 @@ const logout = async () => {
   }
 }
 
-onMounted(fetchUser)
+onMounted(async () => {
+  await Promise.all([fetchUser(), fetchNotifications()])
+})
 </script>
 
 <template>
@@ -79,13 +115,40 @@ onMounted(fetchUser)
 
       <div class="flex items-center gap-4">
         <!-- Notifications -->
-        <button class="text-white relative">
-          <BsBell />
-          <span
-            class="absolute -top-1 -right-1 bg-red-600 text-xs w-4 h-4 rounded-full flex items-center justify-center">
-            2
-          </span>
-        </button>
+        <div class="relative">
+          <button class="text-white relative" @click="toggleNotifications">
+            <BsBell />
+            <span
+              v-if="unreadCount > 0"
+              class="absolute -top-1 -right-1 bg-red-600 text-xs min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+              {{ unreadCount > 9 ? '9+' : unreadCount }}
+            </span>
+          </button>
+
+          <div
+            v-if="isNotificationOpen"
+            class="absolute right-0 mt-3 w-80 bg-white text-gray-800 rounded-md shadow-lg border z-50 max-h-96 overflow-y-auto">
+            <div class="px-4 py-3 border-b font-semibold">Event Notifications</div>
+
+            <button
+              v-for="n in notifications"
+              :key="n.id"
+              @click="openEventFromNotification(n)"
+              class="w-full text-left px-4 py-3 border-b last:border-b-0 hover:bg-gray-50"
+            >
+              <p :class="n.is_read ? 'text-gray-600' : 'font-semibold text-gray-900'">
+                {{ n.event?.title || 'New event added' }}
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                {{ n.event?.start_date }} - {{ n.event?.end_date || n.event?.start_date }}
+              </p>
+            </button>
+
+            <p v-if="notifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
+              No notifications yet
+            </p>
+          </div>
+        </div>
 
         <!-- Messages -->
         <button class="text-white relative">

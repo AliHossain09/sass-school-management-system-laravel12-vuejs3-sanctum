@@ -8,6 +8,7 @@
     },
     "devDependencies": {
         "@rollup/rollup-linux-x64-gnu": "^4.59.0",
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.2.1",
         "@tailwindcss/vite": "^4.1.18",
         "@vitejs/plugin-vue": "^6.0.3",
         "axios": "^1.11.0",

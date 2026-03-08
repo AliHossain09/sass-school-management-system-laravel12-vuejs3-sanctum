@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\SectionController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherController;
+use App\Http\Controllers\Api\EventNotificationController;
 use App\Http\Controllers\Api\MasterAdminController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\ClassRoutineController;
@@ -49,6 +50,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/events', [EventController::class, 'index']);
     Route::get('/events/calendar', [EventController::class, 'calendarEvents']);
+    Route::get('/event-notifications', [EventNotificationController::class, 'index']);
+    Route::post('/event-notifications/{eventNotification}/read', [EventNotificationController::class, 'markAsRead']);
     // Everyone logged in can VIEW notices index route with optional filters
     Route::get('/notices', [NoticeController::class, 'index']);
     //ClassRoutineController index route with optional filters

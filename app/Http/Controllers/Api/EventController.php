@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\User;
+use App\Notifications\EventCreatedNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 
 class EventController extends Controller
@@ -56,6 +59,14 @@ class EventController extends Controller
             'end_date' => $request->end_date,
             'school_id' => auth()->user()->school_id, // secure, from logged-in user
         ]);
+
+        $recipients = User::where('school_id', auth()->user()->school_id)
+            ->whereIn('role', ['teacher', 'student'])
+            ->get();
+
+        if ($recipients->isNotEmpty()) {
+            Notification::send($recipients, new EventCreatedNotification($event));
+        }
 
         return response()->json([
             'success' => true,
