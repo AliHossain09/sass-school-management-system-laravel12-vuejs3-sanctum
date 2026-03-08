@@ -30,8 +30,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 COPY . /var/www
 
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R ug+rwx storage bootstrap/cache
+    && chmod -R ug+rwx storage bootstrap/cache \
+    && chmod +x /var/www/docker/entrypoint.sh
 
 EXPOSE 9000
 
+ENTRYPOINT ["/var/www/docker/entrypoint.sh"]
 CMD ["php-fpm"]
