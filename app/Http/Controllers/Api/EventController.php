@@ -3,27 +3,31 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Event\StoreEventRequest;
+use App\Http\Requests\Event\UpdateEventRequest;
 use App\Models\Event;
-use App\Models\User;
-use App\Notifications\EventCreatedNotification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
+use App\Services\EventService;
 
 class EventController extends Controller
 {
+    public function __construct(protected EventService $eventService)
+    {
+    }
+
     // LIST EVENTS (WITH SEARCH & PAGINATION)
 
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $search = $request->input('search', '');
         $schoolId = $request->user()->school_id ?? $request->input('school_id'); // if logged-in user's have school_id
 
-        $events = Event::query()
-            ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
-            ->when($search, fn ($q) => $q->where('title', 'like', "%$search%"))
-            ->orderBy('start_date', 'desc')
-            ->paginate($request->input('per_page', 10));
+        $events = $this->eventService->paginate(
+            $schoolId,
+            $search,
+            (int) $request->input('per_page', 10)
+        );
 
         return response()->json($events);
     }
@@ -31,42 +35,14 @@ class EventController extends Controller
     // Calendar only (NO pagination)
     public function calendarEvents(Request $request)
     {
-        return Event::where('school_id', $request->user()->school_id)
-            ->select('id', 'title', 'start_date', 'end_date')
-            ->get();
+        return $this->eventService->calendarEvents($request->user()->school_id);
     }
 
     // CREATE NEW EVENT
 
-    public function store(Request $request)
+    public function store(StoreEventRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
-
-        $event = Event::create([
-            'title' => $request->title,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'school_id' => auth()->user()->school_id, // secure, from logged-in user
-        ]);
-
-        $recipients = User::where('school_id', auth()->user()->school_id)
-            ->whereIn('role', ['teacher', 'student'])
-            ->get();
-
-        if ($recipients->isNotEmpty()) {
-            Notification::send($recipients, new EventCreatedNotification($event));
-        }
+        $event = $this->eventService->store($request->user(), $request->validated());
 
         return response()->json([
             'success' => true,
@@ -77,45 +53,30 @@ class EventController extends Controller
 
     // UPDATE EVENT
 
-    public function update(Request $request, Event $event)
+    public function update(UpdateEventRequest $request, Event $event): JsonResponse
     {
-        // Security: ensure same school
-        if ($event->school_id !== auth()->user()->school_id) {
+        $updated = $this->eventService->update($request->user(), $event, $request->validated());
+
+        if (! $updated) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
-        $validator = Validator::make($request->all(), [
-            'title' => 'nullable|string|max:255',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first(),
-            ], 422);
-        }
-
-        $event->update(array_filter($request->only(['title', 'start_date', 'end_date'])));
-
         return response()->json([
             'success' => true,
-            'data' => $event,
+            'data' => $updated,
             'message' => 'Event updated successfully',
         ]);
     }
 
     //  DELETE EVENT
 
-    public function destroy(Event $event)
+    public function destroy(Request $request, Event $event): JsonResponse
     {
-        // Security: ensure same school
-        if ($event->school_id !== auth()->user()->school_id) {
+        $ok = $this->eventService->destroy($request->user(), $event);
+
+        if (! $ok) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
-
-        $event->delete();
 
         return response()->json([
             'success' => true,
