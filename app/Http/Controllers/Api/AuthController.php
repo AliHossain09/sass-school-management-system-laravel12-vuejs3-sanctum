@@ -3,104 +3,56 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Services\AuthService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
      use ApiResponseTrait;
 
+    public function __construct(protected AuthService $authService)
+    {
+    }
 
     // Controller methods will go here
-    public function register(Request $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
+        $result = $this->authService->register($request->validated());
 
-
-        if ($validator->fails()) {
-            return $this->errorResponse(
-                'Validation Error',
-                422,
-                $validator->errors()
-            );
-        }
-
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-
-        return $this->successResponse([
-            'user' => $user,
-            'token' => $token,
-        ], 'User registered successfully', 201);
+        return $this->successResponse(
+            $result['data'],
+            $result['message'],
+            201
+        );
     }
 
 
-     public function login(Request $request): JsonResponse
+     public function login(LoginRequest $request): JsonResponse
     {
-        //  Validation
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+        $result = $this->authService->login($request->validated());
 
-
-        if ($validator->fails()) {
-            return $this->errorResponse(
-                'Validation Error',
-                422,
-                $validator->errors()
-            );
-        }
-
-
-        //  Attempt login
-        if (! Auth::attempt($request->only('email', 'password'))) {
+        if (! $result) {
             return $this->errorResponse('Unauthorized', 401);
         }
 
-
-        //  Success
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-
-        return $this->successResponse([
-            'user' => $user,
-            'token' => $token,
-        ], 'User logged in successfully');
+        return $this->successResponse(
+            $result['data'],
+            $result['message']
+        );
     }
 
 
     public function logout(Request $request): JsonResponse
     {
-        //  authenticated user
-        $user = $request->user();
+        $ok = $this->authService->logout($request->user());
 
-
-        if (! $user || ! $user->currentAccessToken()) {
+        if (! $ok) {
             return $this->errorResponse('Unauthorized', 401);
         }
-
-
-        //  current token revoke
-        $user->currentAccessToken()->delete();
-
 
         return $this->successResponse(
             null,
