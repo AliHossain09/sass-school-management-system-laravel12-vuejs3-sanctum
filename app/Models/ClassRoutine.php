@@ -12,19 +12,43 @@ class ClassRoutine extends Model
         'section_id',
         'subject_id',
         'teacher_id',
+        'day',
         'start_time',
         'end_time',
         'is_break',
-        'other_days',
         'class_room',
     ];
 
+    protected $appends = ['other_days'];
+
     protected $casts = [
-        'other_days' => 'array',
         'is_break' => 'boolean',
         'start_time' => 'datetime:H:i',
         'end_time' => 'datetime:H:i',
     ];
+
+    public function getOtherDaysAttribute($value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            return [$value];
+        }
+
+        $day = $this->attributes['day'] ?? null;
+        if (is_string($day) && $day !== '') {
+            return [$day];
+        }
+
+        return [];
+    }
 
     public function schoolClass()
     {

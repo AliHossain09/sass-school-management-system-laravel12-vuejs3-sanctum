@@ -3,84 +3,36 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClassRoutine\StoreClassRoutineRequest;
+use App\Http\Requests\ClassRoutine\UpdateClassRoutineRequest;
 use App\Models\ClassRoutine;
+use App\Services\ClassRoutineService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ClassRoutineController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(protected ClassRoutineService $classRoutineService)
+    {
+    }
+
+    public function index(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        $query = \App\Models\ClassRoutine::where('school_id', $user->school_id);
+        $result = $this->classRoutineService->buildIndexQuery($user, $request->all());
 
-        // STUDENT → Own class & section only
-
-        if ($user->role === 'student') {
-
-            $student = \App\Models\Student::where('user_id', $user->id)->first();
-
-            if (! $student) {
-                return response()->json([
-                    'message' => 'Student record not found',
-                ], 404);
-            }
-
-            $query->where('class_id', $student->class_id)
-                ->where('section_id', $student->section_id);
+        if (isset($result['error'])) {
+            return response()->json(
+                ['message' => $result['error']['message']],
+                $result['error']['code']
+            );
         }
 
-        // TEACHER → Own routines + optional class & subject filter
-
-        elseif ($user->role === 'teacher') {
-
-            $teacher = \App\Models\Teacher::where('user_id', $user->id)->first();
-
-            if (! $teacher) {
-                return response()->json([
-                    'message' => 'Teacher record not found',
-                ], 404);
-            }
-
-            $query->where('teacher_id', $teacher->id);
-
-            // Optional Filters
-            if ($request->filled('class_id')) {
-                $query->where('class_id', $request->class_id);
-            }
-
-            if ($request->filled('subject_id')) {
-                $query->where('subject_id', $request->subject_id);
-            }
-        }
-
-        // HEADMASTER → Full filter control
-
-        elseif ($user->role === 'headmaster') {
-
-            if ($request->filled('class_id')) {
-                $query->where('class_id', $request->class_id);
-            }
-
-            if ($request->filled('section_id')) {
-                $query->where('section_id', $request->section_id);
-            }
-
-            if ($request->filled('teacher_id')) {
-                $query->where('teacher_id', $request->teacher_id);
-            }
-
-            if ($request->filled('subject_id')) {
-                $query->where('subject_id', $request->subject_id);
-            }
-        }
-
-        // Eager Load + Sorting
+        $query = $result['query'];
 
         $query->with(['schoolClass', 'section', 'subject', 'teacher'])
             ->orderBy('start_time');
-
-        // Pagination Logic
 
         if ($request->boolean('all')) {
             return response()->json($query->get());
@@ -88,77 +40,42 @@ class ClassRoutineController extends Controller
 
         $perPage = $request->get('per_page', 10);
 
-        return response()->json(
-            $query->paginate($perPage)
-        );
+        return response()->json($query->paginate($perPage));
     }
 
-    // Store a routine entry
-    public function store(Request $request)
+    public function store(StoreClassRoutineRequest $request): JsonResponse
     {
-        $user = $request->user();
-
-        $validated = $request->validate([
-            'class_id' => 'required|exists:school_classes,id',
-            'section_id' => 'required|exists:sections,id',
-            'subject_id' => 'required|exists:subjects,id',
-            'teacher_id' => 'required|exists:teachers,id',
-            'start_time' => 'required|date_format:H:i',
-            'end_time' => 'required|date_format:H:i|after:start_time',
-            'is_break' => 'boolean',
-            'other_days' => 'nullable|array',
-            'other_days.*' => 'in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'class_room' => 'nullable|string|max:100',
-        ]);
-
-        $validated['school_id'] = $user->school_id;
-
-        $routine = ClassRoutine::create($validated);
+        $created = $this->classRoutineService->store($request->user(), $request->validated());
 
         return response()->json([
             'success' => true,
-            'data' => $routine,
+            'data' => $created['data'],
             'message' => 'Class routine created successfully',
         ], 201);
     }
 
-    // Update a routine entry
-    public function update(Request $request, ClassRoutine $classRoutine)
+    public function update(UpdateClassRoutineRequest $request, ClassRoutine $classRoutine): JsonResponse
     {
-        if ($classRoutine->school_id !== $request->user()->school_id) {
+        $updated = $this->classRoutineService->update($request->user(), $classRoutine, $request->validated());
+
+        if (! $updated) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $validated = $request->validate([
-            'class_id' => 'sometimes|exists:school_classes,id',
-            'section_id' => 'sometimes|exists:sections,id',
-            'subject_id' => 'sometimes|exists:subjects,id',
-            'teacher_id' => 'sometimes|exists:teachers,id',
-            'start_time' => 'sometimes|date_format:H:i',
-            'end_time' => 'sometimes|date_format:H:i|after:start_time',
-            'is_break' => 'sometimes|boolean',
-            'other_days' => 'nullable|array',
-            'other_days.*' => 'in:Saturday,Sunday,Monday,Tuesday,Wednesday,Thursday,Friday',
-            'class_room' => 'nullable|string|max:100',
-        ]);
-
-        $classRoutine->update($validated);
-
         return response()->json([
             'success' => true,
-            'data' => $classRoutine,
+            'data' => $updated,
             'message' => 'Class routine updated successfully',
         ]);
     }
 
-    // Delete a routine entry
-    public function destroy(Request $request, ClassRoutine $classRoutine)
+    public function destroy(Request $request, ClassRoutine $classRoutine): JsonResponse
     {
-        if ($classRoutine->school_id !== $request->user()->school_id) {
+        $ok = $this->classRoutineService->destroy($request->user(), $classRoutine);
+
+        if (! $ok) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $classRoutine->delete();
 
         return response()->json([
             'success' => true,
@@ -166,3 +83,4 @@ class ClassRoutineController extends Controller
         ]);
     }
 }
+
