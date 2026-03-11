@@ -15,6 +15,7 @@ RUN apk add --no-cache \
         libzip-dev \
         oniguruma-dev \
         unzip \
+        $PHPIZE_DEPS \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j"$(nproc)" \
         bcmath \
@@ -23,6 +24,9 @@ RUN apk add --no-cache \
         mbstring \
         pdo_mysql \
         zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del --no-network $PHPIZE_DEPS \
     && rm -rf /var/cache/apk/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer

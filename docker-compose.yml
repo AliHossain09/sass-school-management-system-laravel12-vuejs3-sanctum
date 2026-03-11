@@ -6,10 +6,13 @@ services:
     container_name: sms_app
     restart: unless-stopped
     working_dir: /var/www
+    env_file:
+      - .env.docker
     volumes:
       - ./:/var/www
     depends_on:
       - db
+      - redis
 
   nginx:
     image: nginx:1.27-alpine
@@ -38,6 +41,20 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
 
+  redis:
+    image: redis:7-alpine
+    container_name: sms_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   vite:
     image: node:20
     container_name: sms_vite
@@ -56,3 +73,4 @@ services:
 volumes:
   dbdata:
   node_modules:
+  redisdata:
