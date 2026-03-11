@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Subject\StoreSubjectRequest;
+use App\Http\Requests\Subject\UpdateSubjectRequest;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\SubjectService;
+use Illuminate\Http\JsonResponse;
 
 class SubjectController extends Controller
 {
+    public function __construct(protected SubjectService $subjectService)
+    {
+    }
+
     // List Subjects
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 10);
         $search  = $request->get('search');
 
-        $query = Subject::with('schoolClass', 'teacher')
-            ->where('school_id', auth()->user()->school_id);
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $subjects = $query->paginate($perPage);
+        $subjects = $this->subjectService->paginate($request->user(), (int) $perPage, $search);
 
         return response()->json([
             'success' => true,
@@ -38,24 +39,9 @@ class SubjectController extends Controller
     }
 
     // Create Subject
-    public function store(Request $request)
+    public function store(StoreSubjectRequest $request): JsonResponse
     {
-        $request->validate([
-            'class_id' => 'required|exists:school_classes,id',
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:core,elective,optional',
-            'code' => 'nullable|string|max:50',
-            'teacher_id' => 'nullable|exists:teachers,id',
-        ]);
-
-        $subject = Subject::create([
-            'name' => $request->name,
-            'class_id' => $request->class_id,
-            'type' => $request->type,
-            'code' => $request->code,
-            'teacher_id' => $request->teacher_id,
-            'school_id' => auth()->user()->school_id,
-        ]);
+        $subject = $this->subjectService->store($request->user(), $request->validated());
 
         return response()->json([
             'success' => true,
@@ -65,35 +51,33 @@ class SubjectController extends Controller
     }
 
     // Update Subject
-    public function update(Request $request, $id)
+    public function update(UpdateSubjectRequest $request, $id): JsonResponse
     {
-        $subject = Subject::where('school_id', auth()->user()->school_id)
-            ->findOrFail($id);
+        $subject = Subject::where('school_id', $request->user()->school_id)->findOrFail($id);
 
-        $request->validate([
-            'class_id' => 'nullable|exists:school_classes,id',
-            'name' => 'nullable|string|max:255',
-            'type' => 'nullable|in:core,elective,optional',
-            'code' => 'nullable|string|max:50',
-            'teacher_id' => 'nullable|exists:teachers,id',
-        ]);
+        $updated = $this->subjectService->update($request->user(), $subject, $request->validated());
 
-        $subject->update(array_filter($request->only(['name','class_id','type','code','teacher_id']), fn($v) => $v !== null));
+        if (! $updated) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         return response()->json([
             'success' => true,
-            'data' => $subject,
+            'data' => $updated,
             'message' => 'Subject updated successfully',
         ]);
     }
 
     // Delete Subject
-    public function destroy($id)
+    public function destroy(Request $request, $id): JsonResponse
     {
-        $subject = Subject::where('school_id', auth()->user()->school_id)
-            ->findOrFail($id);
+        $subject = Subject::where('school_id', $request->user()->school_id)->findOrFail($id);
 
-        $subject->delete();
+        $ok = $this->subjectService->destroy($request->user(), $subject);
+
+        if (! $ok) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         return response()->json([
             'success' => true,
