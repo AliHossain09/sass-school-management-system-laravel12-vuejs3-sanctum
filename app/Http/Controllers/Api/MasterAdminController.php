@@ -3,19 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AcademicYear;
 use App\Models\School;
-use App\Models\User;
-use Carbon\Carbon;
+use App\Http\Requests\School\StoreSchoolRequest;
+use App\Http\Requests\School\UpdateSchoolRequest;
+use App\Services\MasterAdminService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MasterAdminController extends Controller
 {
+    public function __construct(protected MasterAdminService $masterAdminService)
+    {
+    }
+
     // List Schools
-    public function schools(Request $request)
+    public function schools(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 10); // optional, default 10
-        $schools = School::with('headmaster')->paginate($perPage);
+        $schools = $this->masterAdminService->paginateSchools((int) $perPage);
 
         return response()->json([
             'success' => true,
@@ -31,42 +36,9 @@ class MasterAdminController extends Controller
         ]);
     }
 
-    public function createSchool(Request $request)
+    public function createSchool(StoreSchoolRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required',
-            'password' => 'required|min:6',
-            'address' => 'required',
-        ]);
-
-        //  Create school FIRST
-        $school = School::create([
-            'name' => $request->name,
-            'address' => $request->address,
-        ]);
-
-        // Create headmaster user
-        $headmaster = User::create([
-            'name' => $request->name.' Headmaster',
-            'email' => strtolower(str_replace(' ', '', $request->name))
-                        .rand(1000, 9999).'@school.com',
-            'password' => bcrypt($request->password),
-            'role' => 'headmaster',
-            'school_id' => $school->id,
-        ]);
-
-        //  Update school with headmaster_id
-        $school->update([
-            'headmaster_id' => $headmaster->id,
-        ]);
-
-        //  AUTO CREATE ACADEMIC YEAR
-        AcademicYear::create([
-            'school_id' => $school->id,
-            'start_date' => Carbon::now()->startOfYear(),
-            'end_date' => Carbon::now()->endOfYear(),
-            'is_active' => true,
-        ]);
+        $school = $this->masterAdminService->createSchool($request->validated());
 
         return response()->json([
             'success' => true,
@@ -76,17 +48,9 @@ class MasterAdminController extends Controller
     }
 
     // Update School
-    public function updateSchool(Request $request, School $school)
+    public function updateSchool(UpdateSchoolRequest $request, School $school): JsonResponse
     {
-        $request->validate([
-            'name' => 'required',
-            'address' => 'required',
-        ]);
-
-        $school->update([
-            'name' => $request->name,
-            'address' => $request->address,
-        ]);
+        $school = $this->masterAdminService->updateSchool($school, $request->validated());
 
         return response()->json([
             'success' => true,
@@ -96,12 +60,9 @@ class MasterAdminController extends Controller
     }
 
     // Delete School
-    public function deleteSchool(School $school)
+    public function deleteSchool(School $school): JsonResponse
     {
-        // delete headmaster + all users of this school
-        User::where('school_id', $school->id)->delete();
-
-        $school->delete();
+        $this->masterAdminService->deleteSchool($school);
 
         return response()->json([
             'success' => true,
