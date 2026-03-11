@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\SchoolClass\StoreSchoolClassRequest;
+use App\Http\Requests\SchoolClass\UpdateSchoolClassRequest;
 use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\SchoolClassService;
+use Illuminate\Http\JsonResponse;
 
 class ClassController extends Controller
 {
+    public function __construct(protected SchoolClassService $schoolClassService)
+    {
+    }
+
      // List Classes (with pagination & search)
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 10);
         $search  = $request->get('search');
 
-        $query = SchoolClass::where('school_id', auth()->user()->school_id);
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $classes = $query->paginate($perPage);
+        $classes = $this->schoolClassService->paginate($request->user(), (int) $perPage, $search);
 
         return response()->json([
             'success' => true,
@@ -37,22 +39,9 @@ class ClassController extends Controller
     }
 
     // Create Class
-    public function store(Request $request)
+    public function store(StoreSchoolClassRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'order' => 'nullable|integer',
-            'group' => 'nullable|string',
-            'description' => 'nullable|string',
-        ]);
-
-        $class = SchoolClass::create([
-            'school_id' => auth()->user()->school_id,
-            'name' => $request->name,
-            'order' => $request->order,
-            'group' => $request->group,
-            'description' => $request->description,
-        ]);
+        $class = $this->schoolClassService->store($request->user(), $request->validated());
 
         return response()->json([
             'success' => true,
@@ -62,29 +51,29 @@ class ClassController extends Controller
     }
 
     // Update Class
-    public function update(Request $request, SchoolClass $schoolClass)
+    public function update(UpdateSchoolClassRequest $request, SchoolClass $schoolClass): JsonResponse
     {
-        if ($schoolClass->school_id !== auth()->user()->school_id) {
+        $updated = $this->schoolClassService->update($request->user(), $schoolClass, $request->validated());
+
+        if (! $updated) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $schoolClass->update($request->only(['name', 'order', 'group', 'description']));
-
         return response()->json([
             'success' => true,
-            'data' => $schoolClass,
+            'data' => $updated,
             'message' => 'Class updated successfully',
         ]);
     }
 
     // Delete Class
-    public function destroy(SchoolClass $schoolClass)
+    public function destroy(Request $request, SchoolClass $schoolClass): JsonResponse
     {
-        if ($schoolClass->school_id !== auth()->user()->school_id) {
+        $ok = $this->schoolClassService->destroy($request->user(), $schoolClass);
+
+        if (! $ok) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $schoolClass->delete();
 
         return response()->json([
             'success' => true,
