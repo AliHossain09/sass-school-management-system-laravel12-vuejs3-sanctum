@@ -2,32 +2,26 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
 use App\Models\Teacher;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Teacher\StoreTeacherRequest;
+use App\Http\Requests\Teacher\UpdateTeacherRequest;
+use App\Services\TeacherService;
+use Illuminate\Http\JsonResponse;
 
 class TeacherController extends Controller
 {
- 
-     public function indexTeachers(Request $request)
+    public function __construct(protected TeacherService $teacherService)
+    {
+    }
+
+     public function indexTeachers(Request $request): JsonResponse
 {
     $perPage = $request->get('per_page', 10);
     $search  = $request->get('search');
 
-    $query = Teacher::where('school_id', auth()->user()->school_id);
-
-    if ($search) {
-        $query->where(function ($q) use ($search) {
-            $q->whereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"])
-              ->orWhere('email', 'like', "%{$search}%")
-              ->orWhere('phone', 'like', "%{$search}%");
-        });
-    }
-
-    $teachers = $query->paginate($perPage);
+    $teachers = $this->teacherService->paginate($request->user(), (int) $perPage, $search);
 
     return response()->json([
         'success' => true,
@@ -43,53 +37,13 @@ class TeacherController extends Controller
     ]);
 }
 
-    public function storeTeacher(Request $request)
+    public function storeTeacher(StoreTeacherRequest $request): JsonResponse
     {
-        $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'gender' => 'required',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        ]);
-
-        $photoPath = null;
-
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')
-                ->store('teachers', 'public');
-        }
-
-        //new User creation for teacher
-        $user = User::create([
-            'name' => $request->first_name . ' ' . $request->last_name,
-            'email' => $request->email,
-            'password' => bcrypt('password'), // Default password, should be changed later
-            'role' => 'teacher',
-            'school_id' => auth()->user()->school_id,
-        ]);
-
-        $teacher = Teacher::create([
-            'teacher_code' => 'T-'.strtoupper(Str::random(6)),
-            'user_id' => $user->id,
-            'school_id' => auth()->user()->school_id,
-
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'gender' => $request->gender,
-            'dob' => $request->dob,
-
-            'designation' => $request->designation,
-            'department' => $request->department,
-
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'address' => $request->address,
-
-            'guardian_name' => $request->guardian_name,
-            'guardian_phone' => $request->guardian_phone,
-
-            'photo' => $photoPath,
-        ]);
+        $teacher = $this->teacherService->store(
+            $request->user(),
+            $request->validated(),
+            $request->file('photo')
+        );
 
         return response()->json([
             'success' => true,
@@ -98,93 +52,33 @@ class TeacherController extends Controller
         ], 201);
     }
 
-    public function updateTeacher(Request $request, Teacher $teacher)
+    public function updateTeacher(UpdateTeacherRequest $request, Teacher $teacher): JsonResponse
     {
-        // Validate all fields
-        $request->validate([
-            'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
-            'gender' => 'nullable|in:male,female,other',
-            'dob' => 'nullable|date',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'nid' => 'nullable|string',
-
-            'subjects' => 'nullable|array',
-            'class_assigned' => 'nullable|string',
-            'joining_date' => 'nullable|date',
-            'grade' => 'nullable|string',
-            'employment_type' => 'nullable|in:full-time,part-time',
-            'department' => 'nullable|string',
-
-            'phone' => 'nullable|string',
-            'email' => 'nullable|email',
-            'address' => 'nullable|string',
-
-            'emergency_contact' => 'nullable|string',
-            'qualification' => 'nullable|string',
-            'experience' => 'nullable|integer',
-            'salary' => 'nullable|numeric',
-        ]);
-
-        // Handle photo upload
-        if ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($teacher->photo) {
-                Storage::disk('public')->delete($teacher->photo);
-            }
-
-            $teacher->photo = $request->file('photo')->store('teachers', 'public');
-        }
-
-        // Update other fields
-        $teacher->fill(
-            array_filter(
-                $request->only([
-                    'first_name',
-                    'last_name',
-                    'gender',
-                    'dob',
-                    'nid',
-                    'subjects',
-                    'class_assigned',
-                    'joining_date',
-                    'grade',
-                    'employment_type',
-                    'department',
-                    'phone',
-                    'email',
-                    'address',
-                    'emergency_contact',
-                    'qualification',
-                    'experience',
-                    'salary',
-                ]),
-                fn ($value) => ! is_null($value)
-            )
+        $updated = $this->teacherService->update(
+            $request->user(),
+            $teacher,
+            $request->validated(),
+            $request->file('photo')
         );
 
-        $teacher->save();
+        if (! $updated) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
         return response()->json([
             'success' => true,
-            'data' => $teacher,
+            'data' => $updated,
             'message' => 'Teacher updated successfully',
         ]);
     }
 
-    public function destroyTeacher(Teacher $teacher)
+    public function destroyTeacher(Request $request, Teacher $teacher): JsonResponse
     {
-        // Security: same school check (recommended)
-        if ($teacher->school_id !== auth()->user()->school_id) {
+        $ok = $this->teacherService->destroy($request->user(), $teacher);
+
+        if (! $ok) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        // Delete photo if exists
-        if ($teacher->photo && Storage::disk('public')->exists($teacher->photo)) {
-            Storage::disk('public')->delete($teacher->photo);
-        }
-
-        $teacher->delete();
 
         return response()->json([
             'success' => true,
