@@ -3,52 +3,29 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\EventNotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Notifications\DatabaseNotification;
 
 class EventNotificationController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(protected EventNotificationService $eventNotificationService)
     {
-        $notifications = $request->user()
-            ->notifications()
-            ->where('type', 'App\\Notifications\\EventCreatedNotification')
-            ->latest()
-            ->take(20)
-            ->get()
-            ->map(function ($notification) {
-                $event = $notification->data['event'] ?? null;
-
-                return [
-                    'id' => $notification->id,
-                    'is_read' => $notification->read_at !== null,
-                    'read_at' => $notification->read_at,
-                    'created_at' => $notification->created_at,
-                    'event' => $event,
-                ];
-            });
-
-        return response()->json([
-            'data' => $notifications,
-            'unread_count' => $notifications->where('is_read', false)->count(),
-        ]);
     }
 
-    public function markAsRead(Request $request, string $eventNotification)
+    public function index(Request $request): JsonResponse
     {
-        /** @var DatabaseNotification|null $notification */
-        $notification = $request->user()
-            ->notifications()
-            ->where('id', $eventNotification)
-            ->where('type', 'App\\Notifications\\EventCreatedNotification')
-            ->first();
+        return response()->json(
+            $this->eventNotificationService->latestForUser($request->user())
+        );
+    }
 
-        if (! $notification) {
+    public function markAsRead(Request $request, string $eventNotification): JsonResponse
+    {
+        $ok = $this->eventNotificationService->markAsRead($request->user(), $eventNotification);
+
+        if (! $ok) {
             return response()->json(['message' => 'Notification not found'], 404);
-        }
-
-        if ($notification->read_at === null) {
-            $notification->markAsRead();
         }
 
         return response()->json([
