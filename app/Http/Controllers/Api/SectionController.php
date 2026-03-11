@@ -2,27 +2,27 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Requests\Section\StoreSectionRequest;
+use App\Http\Requests\Section\UpdateSectionRequest;
 use App\Models\Section;
-use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\SectionService;
+use Illuminate\Http\JsonResponse;
 
 class SectionController extends Controller
 {
+    public function __construct(protected SectionService $sectionService)
+    {
+    }
+
     // List Sections
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $perPage = $request->get('per_page', 10);
         $search  = $request->get('search');
 
-        $query = Section::with('schoolClass')
-            ->where('school_id', auth()->user()->school_id);
-
-        if ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        }
-
-        $sections = $query->paginate($perPage);
+        $sections = $this->sectionService->paginate($request->user(), (int) $perPage, $search);
 
         return response()->json([
             'success' => true,
@@ -39,20 +39,9 @@ class SectionController extends Controller
     }
 
     // Create Section
-    public function store(Request $request)
+    public function store(StoreSectionRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'class_id' => 'required|exists:school_classes,id',
-            'description' => 'nullable|string',
-        ]);
-
-        $section = Section::create([
-            'name' => $request->name,
-            'class_id' => $request->class_id,
-            'description' => $request->description,
-            'school_id' => auth()->user()->school_id,
-        ]);
+        $section = $this->sectionService->store($request->user(), $request->validated());
 
         return response()->json([
             'success' => true,
@@ -62,36 +51,29 @@ class SectionController extends Controller
     }
 
     // Update Section
-    public function update(Request $request, Section $section)
+    public function update(UpdateSectionRequest $request, Section $section): JsonResponse
     {
-        // Security: Same school
-        if ($section->school_id !== auth()->user()->school_id) {
+        $updated = $this->sectionService->update($request->user(), $section, $request->validated());
+
+        if (! $updated) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $request->validate([
-            'name' => 'nullable|string|max:255',
-            'class_id' => 'nullable|exists:school_classes,id',
-            'description' => 'nullable|string',
-        ]);
-
-        $section->update(array_filter($request->only(['name','class_id','description'])));
-
         return response()->json([
             'success' => true,
-            'data' => $section,
+            'data' => $updated,
             'message' => 'Section updated successfully',
         ]);
     }
 
     // Delete Section
-    public function destroy(Section $section)
+    public function destroy(Request $request, Section $section): JsonResponse
     {
-        if ($section->school_id !== auth()->user()->school_id) {
+        $ok = $this->sectionService->destroy($request->user(), $section);
+
+        if (! $ok) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $section->delete();
 
         return response()->json([
             'success' => true,
