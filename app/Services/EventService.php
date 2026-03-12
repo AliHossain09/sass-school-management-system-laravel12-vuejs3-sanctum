@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Notification;
 
 class EventService
 {
-    public function paginate(?int $schoolId, string $search = '', int $perPage = 10)
+    public function paginate(?int $schoolId, ?string $search = '', int $perPage = 10)
     {
+        $search = trim((string) $search);
+
         return Event::query()
             ->when($schoolId, fn ($q) => $q->where('school_id', $schoolId))
             ->when($search, fn ($q) => $q->where('title', 'like', "%{$search}%"))
@@ -71,4 +73,3 @@ class EventService
         return true;
     }
 }
-

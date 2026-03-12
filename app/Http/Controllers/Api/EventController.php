@@ -21,6 +21,10 @@ class EventController extends Controller
     public function index(Request $request): JsonResponse
     {
         $search = $request->input('search', '');
+        if (! is_string($search)) {
+            $search = '';
+        }
+
         $schoolId = $request->user()->school_id ?? $request->input('school_id'); // if logged-in user's have school_id
 
         $events = $this->eventService->paginate(
