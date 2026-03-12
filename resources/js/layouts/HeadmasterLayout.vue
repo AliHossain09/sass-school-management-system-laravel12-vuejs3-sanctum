@@ -7,8 +7,10 @@ import axios from 'axios'
 
 const isSidebarOpen = ref(false)
 const isDropdownOpen = ref(false)
+const isNotificationOpen = ref(false)
 const selectedLanguage = ref('en')
 const router = useRouter()
+const leaveNotifications = ref([])
 
 // User info state
 const user = ref({
@@ -45,6 +47,46 @@ const fetchUser = async () => {
   }
 }
 
+const authHeader = () => ({
+  Authorization: `Bearer ${localStorage.getItem('token')}`,
+})
+
+const unreadLeaveCount = () => leaveNotifications.value.filter(n => !n.read_at).length
+
+const fetchLeaveNotifications = async () => {
+  try {
+    const res = await axios.get('/api/notifications', {
+      headers: authHeader(),
+      params: { kind: 'leave_request_created' },
+    })
+    leaveNotifications.value = res.data?.data || []
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const toggleNotifications = async () => {
+  isNotificationOpen.value = !isNotificationOpen.value
+  if (isNotificationOpen.value) {
+    await fetchLeaveNotifications()
+  }
+}
+
+const openLeaveFromNotification = async (notification) => {
+  try {
+    if (!notification.read_at) {
+      await axios.post(`/api/notifications/${notification.id}/read`, {}, { headers: authHeader() })
+      notification.read_at = new Date().toISOString()
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    isNotificationOpen.value = false
+    const id = notification?.data?.leave_request?.id
+    if (id) router.push(`/leave-requests/${id}`)
+  }
+}
+
 // Logout
 const logout = async () => {
   try {
@@ -63,6 +105,7 @@ const logout = async () => {
 // if Component mounted  user fetching
 onMounted(() => {
   fetchUser()
+  fetchLeaveNotifications()
 })
 </script>
 
@@ -79,10 +122,42 @@ onMounted(() => {
       <!-- Right: notifications, language, profile -->
       <div class="flex items-center gap-4">
         <!-- Notifications -->
-        <button class="text-white relative">
-          <BsBell />
-          <span class="absolute -top-1 -right-1 bg-red-600 text-xs w-4 h-4 rounded-full flex items-center justify-center">3</span>
-        </button>
+        <div class="relative">
+          <button class="text-white relative" @click="toggleNotifications">
+            <BsBell />
+            <span
+              v-if="unreadLeaveCount() > 0"
+              class="absolute -top-1 -right-1 bg-red-600 text-xs min-w-4 h-4 px-1 rounded-full flex items-center justify-center"
+            >
+              {{ unreadLeaveCount() > 9 ? '9+' : unreadLeaveCount() }}
+            </span>
+          </button>
+
+          <div
+            v-if="isNotificationOpen"
+            class="absolute right-0 mt-3 w-96 bg-white text-gray-800 rounded-md shadow-lg border z-50 max-h-96 overflow-y-auto"
+          >
+            <div class="px-4 py-3 border-b font-semibold">Leave Notifications</div>
+
+            <button
+              v-for="n in leaveNotifications"
+              :key="n.id"
+              @click="openLeaveFromNotification(n)"
+              class="w-full text-left px-4 py-3 border-b last:border-b-0 hover:bg-gray-50"
+            >
+              <p :class="n.read_at ? 'text-gray-600' : 'font-semibold text-gray-900'">
+                New leave request: {{ n.data?.leave_request?.user_name || 'User' }}
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                {{ n.data?.leave_request?.leave_type_name || 'Leave' }} • {{ n.data?.leave_request?.start_date }}
+              </p>
+            </button>
+
+            <p v-if="leaveNotifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
+              No notifications yet
+            </p>
+          </div>
+        </div>
 
         <!-- Messages -->
         <button class="text-white relative">

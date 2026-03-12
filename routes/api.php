@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\ClassRoutineController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
+use App\Http\Controllers\Api\NotificationController;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
@@ -59,10 +60,15 @@ Route::middleware('auth:sanctum')->group(function () {
     //ClassRoutineController index route with optional filters
     Route::get('/class-routines', [ClassRoutineController::class, 'index']);
     
+    // Notifications (database)
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+
     // Teacher/Student self-service Leaves
     Route::middleware('role:teacher,student')->group(function () {
         Route::get('/leave-types/available', [LeaveTypeController::class, 'available']);
         Route::post('/leave-requests', [LeaveRequestController::class, 'store']);
+        Route::get('/my/leave-requests', [LeaveRequestController::class, 'myIndex']);
         Route::get('/my/leave-balance', [LeaveRequestController::class, 'myBalance']);
     });
 

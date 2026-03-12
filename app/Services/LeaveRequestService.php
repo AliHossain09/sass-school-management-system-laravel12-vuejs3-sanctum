@@ -41,6 +41,19 @@ class LeaveRequestService
             ->paginate($perPage);
     }
 
+    public function paginateForUser(User $actor, int $perPage = 10, ?string $status = null): LengthAwarePaginator
+    {
+        $status = $status ? trim((string) $status) : null;
+
+        return LeaveRequest::query()
+            ->with(['leaveType:id,name,allowed_days', 'reviewer:id,name'])
+            ->where('school_id', $actor->school_id)
+            ->where('user_id', $actor->id)
+            ->when(in_array($status, [self::STATUS_PENDING, self::STATUS_APPROVED, self::STATUS_REJECTED], true), fn ($q) => $q->where('status', $status))
+            ->orderByDesc('applied_at')
+            ->paginate($perPage);
+    }
+
     public function findForHeadmasterOrFail(User $actor, int $id): LeaveRequest
     {
         return LeaveRequest::query()

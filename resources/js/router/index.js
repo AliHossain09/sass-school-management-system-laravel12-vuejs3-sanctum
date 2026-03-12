@@ -46,6 +46,9 @@ import TeacherEventsCalender from '../components/TeacherMenu/events/TeacherEvent
 import TeacherNotice from '../components/TeacherMenu/notice/TeacherNotice.vue';
 //Routine
 import TeacherRoutine from '../components/TeacherMenu/routine/TeacherRoutine.vue';
+// Leaves (Teacher)
+import TeacherLeaveApply from '../components/TeacherMenu/leaves/TeacherLeaveApply.vue';
+import TeacherLeaveRequests from '../components/TeacherMenu/leaves/TeacherLeaveRequests.vue';
 
 //.................................Student Dashboard.......................................
 import StudentDashboard from '../Pages/dashboard/StudentDashboard.vue';
@@ -113,6 +116,8 @@ const routes = [
   { path: '/events-calender-teacher', component: TeacherEventsCalender, beforeEnter: requireAuth },
   { path: '/notices-teacher', component: TeacherNotice, beforeEnter: requireAuth },
   { path: '/routine-teacher', component: TeacherRoutine, beforeEnter: requireAuth },
+  { path: '/teacher-leave-apply', component: TeacherLeaveApply, beforeEnter: requireAuth },
+  { path: '/teacher-leave-requests', component: TeacherLeaveRequests, beforeEnter: requireAuth },
 
   //.................................Student Dashboard........................................
   { path: '/student-dashboard', component: StudentDashboard, beforeEnter: requireAuth },

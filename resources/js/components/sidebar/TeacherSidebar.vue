@@ -14,6 +14,7 @@ const router = useRouter()
 
 const showTeacherMenu = ref(false)
 const showStudentMenu = ref(false)
+const showLeavesMenu = ref(false)
 
 const logout = () => {
   localStorage.clear()
@@ -116,6 +117,27 @@ const logout = () => {
         <router-link to="/teacher-attendance" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm"
           @click="$emit('close')">
           Teacher Attendance
+        </router-link>
+      </div>
+
+      <!-- LEAVES -->
+      <button
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center justify-between"
+        @click="showLeavesMenu = !showLeavesMenu"
+      >
+        <span class="flex items-center gap-2">
+          <FaWpforms class="w-5 h-5" />
+          Leaves
+        </span>
+        <span>{{ showLeavesMenu ? 'â–²' : 'â–¼' }}</span>
+      </button>
+
+      <div v-if="showLeavesMenu" class="ml-4 flex flex-col gap-1">
+        <router-link to="/teacher-leave-apply" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
+          Apply Leave
+        </router-link>
+        <router-link to="/teacher-leave-requests" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
+          My Leave Requests
         </router-link>
       </div>
 
