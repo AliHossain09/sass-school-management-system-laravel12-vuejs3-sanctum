@@ -58,6 +58,9 @@ import StudentEventsCalender from '../components/StudentMenu/events/StudentEvent
 import StudentNotice from '../components/StudentMenu/notice/StudentNotice.vue';
 //Routine
 import StudentRoutine from '../components/StudentMenu/routine/StudentRoutine.vue';
+// Leaves (Student)
+import StudentLeaveApply from '../components/StudentMenu/leaves/StudentLeaveApply.vue';
+import StudentLeaveRequests from '../components/StudentMenu/leaves/StudentLeaveRequests.vue';
 
 
 import axios from 'axios';
@@ -124,6 +127,8 @@ const routes = [
   { path: '/events-calender-student', component: StudentEventsCalender, beforeEnter: requireAuth },
   { path: '/notices-student', component: StudentNotice, beforeEnter: requireAuth },
   { path: '/routine-student', component: StudentRoutine, beforeEnter: requireAuth },
+  { path: '/student-leave-apply', component: StudentLeaveApply, beforeEnter: requireAuth },
+  { path: '/student-leave-requests', component: StudentLeaveRequests, beforeEnter: requireAuth },
 
 
 ]

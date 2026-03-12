@@ -11,7 +11,8 @@ const isSidebarOpen = ref(false)
 const isDropdownOpen = ref(false)
 const isNotificationOpen = ref(false)
 const selectedLanguage = ref('en')
-const notifications = ref([])
+const eventNotifications = ref([])
+const leaveNotifications = ref([])
 
 // student info
 const user = ref({
@@ -32,12 +33,28 @@ const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem('token')}`,
 })
 
-const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length)
+const unreadCount = computed(() => {
+  const eventUnread = eventNotifications.value.filter(n => !n.is_read).length
+  const leaveUnread = leaveNotifications.value.filter(n => !n.read_at).length
+  return eventUnread + leaveUnread
+})
 
-const fetchNotifications = async () => {
+const fetchEventNotifications = async () => {
   try {
     const res = await axios.get('/api/event-notifications', { headers: authHeader() })
-    notifications.value = res.data?.data || []
+    eventNotifications.value = res.data?.data || []
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const fetchLeaveNotifications = async () => {
+  try {
+    const res = await axios.get('/api/notifications', {
+      headers: authHeader(),
+      params: { kind: 'leave_request_status_updated' },
+    })
+    leaveNotifications.value = res.data?.data || []
   } catch (err) {
     console.error(err)
   }
@@ -46,7 +63,7 @@ const fetchNotifications = async () => {
 const toggleNotifications = async () => {
   isNotificationOpen.value = !isNotificationOpen.value
   if (isNotificationOpen.value) {
-    await fetchNotifications()
+    await Promise.all([fetchEventNotifications(), fetchLeaveNotifications()])
   }
 }
 
@@ -61,6 +78,20 @@ const openEventFromNotification = async (notification) => {
   } finally {
     isNotificationOpen.value = false
     router.push('/events-calender-student')
+  }
+}
+
+const openLeaveFromNotification = async (notification) => {
+  try {
+    if (!notification.read_at) {
+      await axios.post(`/api/notifications/${notification.id}/read`, {}, { headers: authHeader() })
+      notification.read_at = new Date().toISOString()
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    isNotificationOpen.value = false
+    router.push('/student-leave-requests')
   }
 }
 
@@ -95,7 +126,7 @@ const logout = async () => {
 }
 
 onMounted(async () => {
-  await Promise.all([fetchUser(), fetchNotifications()])
+  await Promise.all([fetchUser(), fetchEventNotifications(), fetchLeaveNotifications()])
 })
 </script>
 
@@ -128,10 +159,30 @@ onMounted(async () => {
           <div
             v-if="isNotificationOpen"
             class="absolute right-0 mt-3 w-80 bg-white text-gray-800 rounded-md shadow-lg border z-50 max-h-96 overflow-y-auto">
-            <div class="px-4 py-3 border-b font-semibold">Event Notifications</div>
+            <div class="px-4 py-3 border-b font-semibold">Notifications</div>
+
+            <div class="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50">Leave Updates</div>
+            <button
+              v-for="n in leaveNotifications"
+              :key="n.id"
+              @click="openLeaveFromNotification(n)"
+              class="w-full text-left px-4 py-3 border-b last:border-b-0 hover:bg-gray-50"
+            >
+              <p :class="n.read_at ? 'text-gray-600' : 'font-semibold text-gray-900'">
+                Leave status: {{ n.data?.leave_request?.status || 'updated' }}
+              </p>
+              <p class="text-xs text-gray-500 mt-1">
+                {{ n.data?.leave_request?.leave_type_name || 'Leave' }}
+              </p>
+            </button>
+            <p v-if="leaveNotifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
+              No leave updates
+            </p>
+
+            <div class="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-t">Event Notifications</div>
 
             <button
-              v-for="n in notifications"
+              v-for="n in eventNotifications"
               :key="n.id"
               @click="openEventFromNotification(n)"
               class="w-full text-left px-4 py-3 border-b last:border-b-0 hover:bg-gray-50"
@@ -144,7 +195,7 @@ onMounted(async () => {
               </p>
             </button>
 
-            <p v-if="notifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
+            <p v-if="eventNotifications.length === 0" class="px-4 py-3 text-sm text-gray-500">
               No notifications yet
             </p>
           </div>

@@ -5,7 +5,7 @@ import { FaArchway, FaSchool, FaUserGraduate, FaUserTie, FaBorderAll } from 'vue
 import { FaAddressBook, FaCalendar, FaWpforms } from 'vue-icons-plus/fa'
 
 defineProps({
-  isOpen: Boolean
+  isOpen: Boolean,
 })
 
 defineEmits(['close'])
@@ -14,6 +14,7 @@ const router = useRouter()
 
 const showTeacherMenu = ref(false)
 const showStudentMenu = ref(false)
+const showLeavesMenu = ref(false)
 
 const logout = () => {
   localStorage.clear()
@@ -21,63 +22,75 @@ const logout = () => {
 }
 </script>
 
-
-
 <template>
   <!-- Overlay -->
   <div v-if="isOpen" class="fixed inset-0 bg-black/40 z-40 xl:hidden" @click="$emit('close')"></div>
 
-  <aside class="bg-blue-900 text-white w-64 flex flex-col
+  <aside
+    class="bg-blue-900 text-white w-64 flex flex-col
          fixed top-16 left-0 z-50
          h-[calc(100vh-4rem)]
          transition-transform duration-300
-         overflow-y-auto" :class="{
-          '-translate-x-full xl:translate-x-0': !isOpen,
-          'translate-x-0': isOpen
-        }">
-
+         overflow-y-auto"
+    :class="{
+      '-translate-x-full xl:translate-x-0': !isOpen,
+      'translate-x-0': isOpen,
+    }"
+  >
     <!-- Close (mobile) -->
-    <button class="xl:hidden text-right text-xl mb-4" @click="$emit('close')">
-      ✕
-    </button>
+    <button class="xl:hidden text-right text-xl mb-4" @click="$emit('close')">✕</button>
 
     <nav class="flex flex-col gap-2">
-
       <!-- Dashboard -->
-      <router-link to="/student-dashboard" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/student-dashboard"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaSchool class="w-5 h-5 mr-2" />
         <span>Dashboard</span>
       </router-link>
 
       <!-- Classes -->
-      <router-link to="/school-classes" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/school-classes"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaArchway class="w-5 h-5" />
         <span>Classes</span>
       </router-link>
 
       <!-- Sections -->
-      <router-link to="/sections" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/sections"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaBorderAll class="w-5 h-5" />
         <span>Sections</span>
       </router-link>
 
       <!-- Subjects -->
-      <router-link to="/subjects" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/subjects"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaAddressBook class="w-5 h-5" />
         <span>Subjects</span>
       </router-link>
 
-
       <!-- STUDENT INFO -->
-      <button class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        @click="showStudentMenu = !showStudentMenu">
-
-        <FaUserGraduate class="w-5 h-5 mr-2" />
-        <span>Student Info</span>
+      <button class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center justify-between" @click="showStudentMenu = !showStudentMenu">
+        <span class="flex items-center gap-2">
+          <FaUserGraduate class="w-5 h-5" />
+          Student Info
+        </span>
         <span>{{ showStudentMenu ? '▲' : '▼' }}</span>
       </button>
 
@@ -86,24 +99,24 @@ const logout = () => {
           Student List
         </router-link>
 
-        <router-link to="/student-admission" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm"
-          @click="$emit('close')">
+        <router-link to="/student-admission" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
           Student Admission
         </router-link>
 
-        <router-link to="/student-attendance" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm"
-          @click="$emit('close')">
+        <router-link to="/student-attendance" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
           Student Attendance
         </router-link>
       </div>
 
       <!-- TEACHER INFO -->
-      <button class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        @click="showTeacherMenu = !showTeacherMenu">
-        <FaUserTie class="w-5 h-5 mr-2" />
-        <span>Teacher Info</span>
+      <button class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center justify-between" @click="showTeacherMenu = !showTeacherMenu">
+        <span class="flex items-center gap-2">
+          <FaUserTie class="w-5 h-5" />
+          Teacher Info
+        </span>
         <span>{{ showTeacherMenu ? '▲' : '▼' }}</span>
       </button>
+
       <div v-if="showTeacherMenu" class="ml-4 flex flex-col gap-1">
         <router-link to="/teachers-list" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
           Teacher List
@@ -113,9 +126,26 @@ const logout = () => {
           Add Teacher
         </router-link>
 
-        <router-link to="/teacher-attendance" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm"
-          @click="$emit('close')">
+        <router-link to="/teacher-attendance" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
           Teacher Attendance
+        </router-link>
+      </div>
+
+      <!-- LEAVES -->
+      <button class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center justify-between" @click="showLeavesMenu = !showLeavesMenu">
+        <span class="flex items-center gap-2">
+          <FaWpforms class="w-5 h-5" />
+          Leaves
+        </span>
+        <span>{{ showLeavesMenu ? '▲' : '▼' }}</span>
+      </button>
+
+      <div v-if="showLeavesMenu" class="ml-4 flex flex-col gap-1">
+        <router-link to="/student-leave-apply" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
+          Apply Leave
+        </router-link>
+        <router-link to="/student-leave-requests" class="px-3 py-2 rounded hover:bg-indigo-600 text-sm" @click="$emit('close')">
+          My Leave Requests
         </router-link>
       </div>
 
@@ -123,37 +153,50 @@ const logout = () => {
         to="/routine-student"
         class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
         active-class="bg-indigo-600"
+        @click="$emit('close')"
       >
         <FaWpforms class="w-5 h-5" />
         Routine
       </router-link>
 
       <!-- Notices -->
-      <router-link to="/notices-student" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/notices-student"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaAddressBook class="w-5 h-5 mr-2" />
         <span>Notices</span>
       </router-link>
 
       <!-- Events -->
-      <router-link to="/events-calender-student" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/events-calender-student"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaCalendar class="w-5 h-5 mr-2" />
         <span>Events</span>
       </router-link>
 
       <!-- Academic Year -->
-      <router-link to="/academic-year" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
-        active-class="bg-indigo-600" @click="$emit('close')">
+      <router-link
+        to="/academic-year"
+        class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2"
+        active-class="bg-indigo-600"
+        @click="$emit('close')"
+      >
         <FaUserGraduate class="w-5 h-5 mr-2" />
         <span>Academic Year</span>
       </router-link>
-
     </nav>
 
     <!-- LOGOUT -->
-    <!-- <button @click="logout" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded mt-6">
-      Logout
-    </button> -->
+    <div class="p-4 mt-auto">
+      <button @click="logout" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded">Logout</button>
+    </div>
   </aside>
 </template>
+
