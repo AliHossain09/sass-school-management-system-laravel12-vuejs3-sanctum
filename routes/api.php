@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\EventNotificationController;
 use App\Http\Controllers\Api\MasterAdminController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\ClassRoutineController;
+use App\Http\Controllers\Api\LeaveRequestController;
+use App\Http\Controllers\Api\LeaveTypeController;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
@@ -120,6 +122,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/academic-years', [AcademicYearController::class, 'store']);
         Route::put('/academic-years/{academicYear}', [AcademicYearController::class, 'update']);
         Route::delete('/academic-years/{academicYear}', [AcademicYearController::class, 'destroy']);
+
+        // Leaves
+        Route::get('/leave-types', [LeaveTypeController::class, 'index']);
+        Route::post('/leave-types', [LeaveTypeController::class, 'store']);
+        Route::put('/leave-types/{leaveType}', [LeaveTypeController::class, 'update']);
+        Route::delete('/leave-types/{leaveType}', [LeaveTypeController::class, 'destroy']);
+
+        Route::get('/leave-requests', [LeaveRequestController::class, 'index']);
+        Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
+        Route::patch('/leave-requests/{leaveRequest}/status', [LeaveRequestController::class, 'updateStatus']);
+        Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
 
     });
 });

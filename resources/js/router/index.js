@@ -31,6 +31,10 @@ import EventsList from '../components/HeadmasterMenu/events/EventList.vue';
 import AcademicYear from '../components/HeadmasterMenu/academicYear/AcademicYear.vue';
 //Class Routine
 import ClassRoutine from '../components/HeadmasterMenu/routine/ClassRoutineList.vue';
+// Leaves
+import LeaveTypes from '../components/HeadmasterMenu/leaves/LeaveTypes.vue';
+import LeaveRequests from '../components/HeadmasterMenu/leaves/LeaveRequests.vue';
+import LeaveRequestView from '../components/HeadmasterMenu/leaves/LeaveRequestView.vue';
 
 
 //.................................Teacher Dashboard.......................................
@@ -94,6 +98,10 @@ const routes = [
   { path: '/academic-year', component: AcademicYear, beforeEnter: requireAuth },
   //Class Routine
   { path: '/class-routine', component: ClassRoutine, beforeEnter: requireAuth },
+  // Leaves
+  { path: '/leave-types', component: LeaveTypes, beforeEnter: requireAuth },
+  { path: '/leave-requests', component: LeaveRequests, beforeEnter: requireAuth },
+  { path: '/leave-requests/:id', component: LeaveRequestView, beforeEnter: requireAuth },
   
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
