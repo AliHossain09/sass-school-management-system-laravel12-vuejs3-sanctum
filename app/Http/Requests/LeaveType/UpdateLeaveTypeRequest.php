@@ -15,8 +15,10 @@ class UpdateLeaveTypeRequest extends ApiFormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'allowed_days' => 'nullable|integer|min:1|max:366',
+            'applicable_to' => 'nullable|in:all,teacher,student',
+            'applicable_gender' => 'nullable|in:any,male,female,other',
             'is_active' => 'nullable|boolean',
         ];
     }
 }
-

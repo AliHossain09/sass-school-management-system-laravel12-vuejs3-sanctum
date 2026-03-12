@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LeaveRequest\StoreLeaveRequestRequest;
 use App\Http\Requests\LeaveRequest\UpdateLeaveRequestStatusRequest;
 use App\Models\LeaveRequest;
 use App\Services\LeaveRequestService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class LeaveRequestController extends Controller
 {
@@ -96,11 +99,30 @@ class LeaveRequestController extends Controller
         ]);
     }
 
+    public function store(StoreLeaveRequestRequest $request): JsonResponse
+    {
+        try {
+            $leaveRequest = $this->leaveRequestService->createForUser($request->user(), $request->validated());
+        } catch (ValidationException $e) {
+            throw $e;
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $leaveRequest,
+            'message' => 'Leave request submitted',
+        ], 201);
+    }
+
     public function updateStatus(UpdateLeaveRequestStatusRequest $request, int $id): JsonResponse
     {
         $leaveRequest = LeaveRequest::where('school_id', $request->user()->school_id)->findOrFail($id);
 
-        $updated = $this->leaveRequestService->updateStatus($request->user(), $leaveRequest, $request->validated());
+        try {
+            $updated = $this->leaveRequestService->updateStatus($request->user(), $leaveRequest, $request->validated());
+        } catch (ValidationException $e) {
+            throw $e;
+        }
 
         if (! $updated) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -110,6 +132,17 @@ class LeaveRequestController extends Controller
             'success' => true,
             'data' => $updated,
             'message' => 'Leave request status updated',
+        ]);
+    }
+
+    public function myBalance(Request $request): JsonResponse
+    {
+        $year = $request->get('year');
+        $date = $year ? Carbon::createFromDate((int) $year, 1, 1) : null;
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->leaveRequestService->balanceForUser($request->user(), $date),
         ]);
     }
 
@@ -129,4 +162,3 @@ class LeaveRequestController extends Controller
         ]);
     }
 }
-

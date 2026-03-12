@@ -37,6 +37,27 @@ class LeaveTypeController extends Controller
         ]);
     }
 
+    public function available(Request $request): JsonResponse
+    {
+        $perPage = (int) $request->get('per_page', 50);
+        $search = $request->get('search');
+
+        $leaveTypes = $this->leaveTypeService->availableFor($request->user(), $perPage, $search);
+
+        return response()->json([
+            'success' => true,
+            'data' => $leaveTypes->items(),
+            'meta' => [
+                'current_page' => $leaveTypes->currentPage(),
+                'from' => $leaveTypes->firstItem(),
+                'to' => $leaveTypes->lastItem(),
+                'per_page' => $leaveTypes->perPage(),
+                'total' => $leaveTypes->total(),
+                'last_page' => $leaveTypes->lastPage(),
+            ],
+        ]);
+    }
+
     public function store(StoreLeaveTypeRequest $request): JsonResponse
     {
         $leaveType = $this->leaveTypeService->store($request->user(), $request->validated());
@@ -81,4 +102,3 @@ class LeaveTypeController extends Controller
         ]);
     }
 }
-

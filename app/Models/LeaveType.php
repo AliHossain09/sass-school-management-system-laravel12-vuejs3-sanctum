@@ -9,6 +9,9 @@ class LeaveType extends Model
     protected $fillable = [
         'school_id',
         'name',
+        'allowed_days',
+        'applicable_to',
+        'applicable_gender',
         'is_active',
     ];
 
@@ -16,6 +19,7 @@ class LeaveType extends Model
     {
         return [
             'is_active' => 'boolean',
+            'allowed_days' => 'integer',
         ];
     }
 
@@ -24,4 +28,3 @@ class LeaveType extends Model
         return $this->belongsTo(School::class);
     }
 }
-

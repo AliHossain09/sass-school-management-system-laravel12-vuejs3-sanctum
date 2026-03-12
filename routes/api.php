@@ -59,6 +59,12 @@ Route::middleware('auth:sanctum')->group(function () {
     //ClassRoutineController index route with optional filters
     Route::get('/class-routines', [ClassRoutineController::class, 'index']);
     
+    // Teacher/Student self-service Leaves
+    Route::middleware('role:teacher,student')->group(function () {
+        Route::get('/leave-types/available', [LeaveTypeController::class, 'available']);
+        Route::post('/leave-requests', [LeaveRequestController::class, 'store']);
+        Route::get('/my/leave-balance', [LeaveRequestController::class, 'myBalance']);
+    });
 
     // Master Admin
     Route::middleware('role:master_admin')->group(function () {

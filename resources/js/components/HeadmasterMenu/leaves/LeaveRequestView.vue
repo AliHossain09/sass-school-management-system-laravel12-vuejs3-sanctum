@@ -58,7 +58,9 @@ const submit = async () => {
     toast.success('Status updated')
     await load()
   } catch (err: any) {
-    toast.error(err.response?.data?.message || 'Failed to update status')
+    const firstError =
+      err.response?.data?.errors ? Object.values(err.response.data.errors)[0]?.[0] : null
+    toast.error(firstError || err.response?.data?.message || 'Failed to update status')
   } finally {
     saving.value = false
   }
@@ -140,4 +142,3 @@ onMounted(() => {
   color: #000;
 }
 </style>
-

@@ -15,6 +15,9 @@ const editing = ref<any | null>(null)
 
 const form = ref({
   name: '',
+  allowed_days: null as number | null,
+  applicable_to: 'all',
+  applicable_gender: 'any',
   is_active: true,
 })
 
@@ -53,7 +56,7 @@ onMounted(() => {
 const openForm = () => {
   activeForm.value = true
   editing.value = null
-  form.value = { name: '', is_active: true }
+  form.value = { name: '', allowed_days: null, applicable_to: 'all', applicable_gender: 'any', is_active: true }
 }
 
 const startEdit = (row: any) => {
@@ -61,6 +64,9 @@ const startEdit = (row: any) => {
   activeForm.value = true
   form.value = {
     name: row.name,
+    allowed_days: row.allowed_days ?? null,
+    applicable_to: row.applicable_to || 'all',
+    applicable_gender: row.applicable_gender || 'any',
     is_active: !!row.is_active,
   }
 }
@@ -73,18 +79,25 @@ const submit = async () => {
 
   loading.value = true
   try {
+    const payload = {
+      ...form.value,
+      allowed_days: form.value.allowed_days ? Number(form.value.allowed_days) : null,
+    }
+
     if (editing.value) {
-      await axios.put(`/api/leave-types/${editing.value.id}`, form.value, { headers: authHeader() })
+      await axios.put(`/api/leave-types/${editing.value.id}`, payload, { headers: authHeader() })
       toast.success('Leave type updated')
     } else {
-      await axios.post('/api/leave-types', form.value, { headers: authHeader() })
+      await axios.post('/api/leave-types', payload, { headers: authHeader() })
       toast.success('Leave type created')
     }
 
     activeForm.value = false
     await loadLeaveTypes(meta.value.current_page)
   } catch (err: any) {
-    toast.error(err.response?.data?.message || 'Failed to save')
+    const firstError =
+      err.response?.data?.errors ? Object.values(err.response.data.errors)[0]?.[0] : null
+    toast.error(firstError || err.response?.data?.message || 'Failed to save')
   } finally {
     loading.value = false
   }
@@ -143,6 +156,9 @@ const deleteLeaveType = async (id: number) => {
             <tr>
               <th class="border border-gray-200 px-4 py-2 text-left">SL</th>
               <th class="border border-gray-200 px-4 py-2 text-left">Leave Type</th>
+              <th class="border border-gray-200 px-4 py-2 text-left">Allowed Days</th>
+              <th class="border border-gray-200 px-4 py-2 text-left">Applicable To</th>
+              <th class="border border-gray-200 px-4 py-2 text-left">Gender</th>
               <th class="border border-gray-200 px-4 py-2 text-left">Status</th>
               <th class="border border-gray-200 px-4 py-2 text-left">Action</th>
             </tr>
@@ -151,6 +167,12 @@ const deleteLeaveType = async (id: number) => {
             <tr v-for="(row, i) in leaveTypes" :key="row.id" class="hover:bg-gray-50">
               <td class="border border-gray-200 px-4 py-2">{{ (meta.from || 1) + i }}</td>
               <td class="border border-gray-200 px-4 py-2">{{ row.name }}</td>
+              <td class="border border-gray-200 px-4 py-2">
+                <span v-if="row.allowed_days">{{ row.allowed_days }} day(s)</span>
+                <span v-else class="text-gray-500">Unlimited</span>
+              </td>
+              <td class="border border-gray-200 px-4 py-2">{{ row.applicable_to || 'all' }}</td>
+              <td class="border border-gray-200 px-4 py-2">{{ row.applicable_gender || 'any' }}</td>
               <td class="border border-gray-200 px-4 py-2">
                 <span
                   :class="row.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'"
@@ -169,7 +191,7 @@ const deleteLeaveType = async (id: number) => {
               </td>
             </tr>
             <tr v-if="!loading && leaveTypes.length === 0">
-              <td colspan="4" class="text-center py-6 text-gray-600">No leave types found</td>
+              <td colspan="7" class="text-center py-6 text-gray-600">No leave types found</td>
             </tr>
           </tbody>
         </table>
@@ -220,6 +242,39 @@ const deleteLeaveType = async (id: number) => {
               <input v-model="form.name" placeholder="Leave Type" class="input text-black" />
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label class="block mb-1">Allowed Days (per year)</label>
+                <input
+                  v-model.number="form.allowed_days"
+                  type="number"
+                  min="1"
+                  max="366"
+                  placeholder="e.g. 10"
+                  class="input text-black"
+                />
+              </div>
+
+              <div>
+                <label class="block mb-1">Applicable To</label>
+                <select v-model="form.applicable_to" class="input text-black">
+                  <option value="all">All</option>
+                  <option value="teacher">Teacher</option>
+                  <option value="student">Student</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block mb-1">Gender</label>
+                <select v-model="form.applicable_gender" class="input text-black">
+                  <option value="any">Any</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label class="block mb-1">Status</label>
               <select v-model="form.is_active" class="input text-black">
@@ -259,4 +314,3 @@ const deleteLeaveType = async (id: number) => {
   cursor: not-allowed;
 }
 </style>
-
