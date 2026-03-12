@@ -38,6 +38,20 @@ class SubjectController extends Controller
         ]);
     }
 
+    public function byClass(Request $request, int $classId): JsonResponse
+    {
+        $subjects = Subject::query()
+            ->where('school_id', $request->user()->school_id)
+            ->where('class_id', $classId)
+            ->orderBy('name')
+            ->get(['id', 'name', 'code', 'type', 'class_id']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $subjects,
+        ]);
+    }
+
     // Create Subject
     public function store(StoreSubjectRequest $request): JsonResponse
     {

@@ -17,6 +17,9 @@ use App\Http\Controllers\Api\ClassRoutineController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ExaminationController;
+use App\Http\Controllers\Api\GradeController;
+use App\Http\Controllers\Api\ExamMarkController;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
@@ -90,12 +93,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Section Management
         Route::get('/sections', [SectionController::class, 'index']);
+        Route::get('/sections/by-class/{classId}', [SectionController::class, 'byClass']);
         Route::post('/sections', [SectionController::class, 'store']);
         Route::put('/sections/{section}', [SectionController::class, 'update']);
         Route::delete('/sections/{section}', [SectionController::class, 'destroy']);
 
         // Subject Management
         Route::get('/subjects', [SubjectController::class, 'index']);
+        Route::get('/subjects/by-class/{classId}', [SubjectController::class, 'byClass']);
         Route::post('/subjects', [SubjectController::class, 'store']);
         Route::put('/subjects/{subject}', [SubjectController::class, 'update']);
         Route::delete('/subjects/{subject}', [SubjectController::class, 'destroy']);
@@ -145,6 +150,22 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'show']);
         Route::patch('/leave-requests/{leaveRequest}/status', [LeaveRequestController::class, 'updateStatus']);
         Route::delete('/leave-requests/{leaveRequest}', [LeaveRequestController::class, 'destroy']);
+
+        // Examinations
+        Route::get('/examinations', [ExaminationController::class, 'index']);
+        Route::post('/examinations', [ExaminationController::class, 'store']);
+        Route::put('/examinations/{examination}', [ExaminationController::class, 'update']);
+        Route::delete('/examinations/{examination}', [ExaminationController::class, 'destroy']);
+
+        // Grades
+        Route::get('/grades', [GradeController::class, 'index']);
+        Route::post('/grades', [GradeController::class, 'store']);
+        Route::put('/grades/{grade}', [GradeController::class, 'update']);
+        Route::delete('/grades/{grade}', [GradeController::class, 'destroy']);
+
+        // Exam Marks
+        Route::get('/exam-marks/manage', [ExamMarkController::class, 'manage']);
+        Route::post('/exam-marks', [ExamMarkController::class, 'upsert']);
 
     });
 });

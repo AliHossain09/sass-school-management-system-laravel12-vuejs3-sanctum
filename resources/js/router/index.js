@@ -36,6 +36,12 @@ import ClassRoutine from '../components/HeadmasterMenu/routine/ClassRoutineList.
 import LeaveTypes from '../components/HeadmasterMenu/leaves/LeaveTypes.vue';
 import LeaveRequests from '../components/HeadmasterMenu/leaves/LeaveRequests.vue';
 import LeaveRequestView from '../components/HeadmasterMenu/leaves/LeaveRequestView.vue';
+// Examinations
+import ExaminationNames from '../components/HeadmasterMenu/examinations/ExaminationNames.vue';
+import ExamGrades from '../components/HeadmasterMenu/examinations/Grades.vue';
+import ExamMarks from '../components/HeadmasterMenu/examinations/ExamMarks.vue';
+import ExamPromotion from '../components/HeadmasterMenu/examinations/Promotion.vue';
+import SendExamMark from '../components/HeadmasterMenu/examinations/SendExamMark.vue';
 
 
 //.................................Teacher Dashboard.......................................
@@ -113,6 +119,13 @@ const routes = [
   { path: '/leave-requests/leave-types', redirect: '/leave-types' },
   // Only numeric ids should open details view
   { path: '/leave-requests/:id(\\d+)', component: LeaveRequestView, beforeEnter: requireAuth },
+
+  // Examinations
+  { path: '/examination-names', component: ExaminationNames, beforeEnter: requireAuth },
+  { path: '/exam-grades', component: ExamGrades, beforeEnter: requireAuth },
+  { path: '/exam-marks', component: ExamMarks, beforeEnter: requireAuth },
+  { path: '/exam-promotion', component: ExamPromotion, beforeEnter: requireAuth },
+  { path: '/send-exam-mark', component: SendExamMark, beforeEnter: requireAuth },
   
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },

@@ -38,6 +38,20 @@ class SectionController extends Controller
         ]);
     }
 
+    public function byClass(Request $request, int $classId): JsonResponse
+    {
+        $sections = Section::query()
+            ->where('school_id', $request->user()->school_id)
+            ->where('class_id', $classId)
+            ->orderBy('name')
+            ->get(['id', 'name', 'class_id']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $sections,
+        ]);
+    }
+
     // Create Section
     public function store(StoreSectionRequest $request): JsonResponse
     {
