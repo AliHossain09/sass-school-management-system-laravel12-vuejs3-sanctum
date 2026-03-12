@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Login from '../Pages/Login.vue';
 import Register from '../Pages/Register.vue';
+import NotFound from '../Pages/NotFound.vue';
 
 //.................................Mater Admin Dashboard....................................
 import MasterDashboard from '../Pages/dashboard/MasterDashboard.vue';
@@ -101,7 +102,11 @@ const routes = [
   // Leaves
   { path: '/leave-types', component: LeaveTypes, beforeEnter: requireAuth },
   { path: '/leave-requests', component: LeaveRequests, beforeEnter: requireAuth },
-  { path: '/leave-requests/:id', component: LeaveRequestView, beforeEnter: requireAuth },
+  // Common wrong URLs -> redirect to correct pages
+  { path: '/leave-types/leave-requests', redirect: '/leave-requests' },
+  { path: '/leave-requests/leave-types', redirect: '/leave-types' },
+  // Only numeric ids should open details view
+  { path: '/leave-requests/:id(\\d+)', component: LeaveRequestView, beforeEnter: requireAuth },
   
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },
@@ -117,6 +122,9 @@ const routes = [
 
 
 ]
+
+// Catch-all (keep last)
+routes.push({ path: '/:pathMatch(.*)*', component: NotFound })
 
 const router = createRouter({
   history: createWebHistory(),

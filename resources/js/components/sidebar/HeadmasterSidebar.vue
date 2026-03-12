@@ -23,7 +23,7 @@ const router = useRouter()
 
 const showTeacherMenu = ref(false)
 const showStudentMenu = ref(false)
-const showLeavesMenu = ref(false)
+const showLeavesMenu = ref(true)
 
 const logout = () => {
   localStorage.clear()
@@ -151,8 +151,20 @@ const logout = () => {
       </button>
 
       <div v-if="showLeavesMenu" class="ml-6 flex flex-col gap-1">
-        <router-link to="/leave-types" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded">Leave Type</router-link>
-        <router-link to="/leave-requests" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded">Leave Request</router-link>
+        <router-link
+          to="/leave-types"
+          class="text-sm hover:bg-indigo-600 px-3 py-2 rounded"
+          @click="$emit('close')"
+        >
+          Leave Type
+        </router-link>
+        <router-link
+          to="/leave-requests"
+          class="text-sm hover:bg-indigo-600 px-3 py-2 rounded"
+          @click="$emit('close')"
+        >
+          Leave Request
+        </router-link>
       </div>
 
        <router-link
