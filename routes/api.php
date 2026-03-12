@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ExaminationController;
 use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ExamMarkController;
+use App\Http\Controllers\Api\ExamScheduleController;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
@@ -166,6 +167,12 @@ Route::middleware('auth:sanctum')->group(function () {
         // Exam Marks
         Route::get('/exam-marks/manage', [ExamMarkController::class, 'manage']);
         Route::post('/exam-marks', [ExamMarkController::class, 'upsert']);
+
+        // Exam Schedules
+        Route::get('/exam-schedules', [ExamScheduleController::class, 'index']);
+        Route::post('/exam-schedules', [ExamScheduleController::class, 'store']);
+        Route::put('/exam-schedules/{id}', [ExamScheduleController::class, 'update']);
+        Route::delete('/exam-schedules/{id}', [ExamScheduleController::class, 'destroy']);
 
     });
 });
