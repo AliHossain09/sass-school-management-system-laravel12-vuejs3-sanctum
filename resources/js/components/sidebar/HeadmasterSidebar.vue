@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import {
@@ -188,6 +188,9 @@ const logout = () => {
         >
         <router-link to="/exam-marks" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded" @click="$emit('close')"
           >Mark</router-link
+        >
+        <router-link to="/exam-seat-plan" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded" @click="$emit('close')"
+          >Seat Plan</router-link
         >
         <router-link to="/exam-schedules" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded" @click="$emit('close')"
           >Exam Schedule</router-link

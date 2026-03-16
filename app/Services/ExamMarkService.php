@@ -29,7 +29,7 @@ class ExamMarkService
             ->where('examination_id', $examinationId)
             ->where('class_id', $classId)
             ->where('subject_id', $subjectId)
-            ->when($sectionId, fn ($q) => $q->where('section_id', $sectionId), fn ($q) => $q->whereNull('section_id'))
+            ->when($sectionId, fn ($q) => $q->where('section_id', $sectionId))
             ->get()
             ->keyBy('student_id');
 
@@ -77,4 +77,3 @@ class ExamMarkService
         return $mark;
     }
 }
-

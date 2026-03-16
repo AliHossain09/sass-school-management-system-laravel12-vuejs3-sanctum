@@ -14,6 +14,7 @@ const examinations = ref<any[]>([])
 const classes = ref<any[]>([])
 const sections = ref<any[]>([])
 const subjects = ref<any[]>([])
+const grades = ref<any[]>([])
 
 const examinationId = ref<number | ''>('')
 const classId = ref<number | ''>('')
@@ -30,12 +31,14 @@ const authHeader = () => ({
 const loadExamsAndClasses = async () => {
   loadingFilters.value = true
   try {
-    const [examsRes, classesRes] = await Promise.all([
+    const [examsRes, classesRes, gradesRes] = await Promise.all([
       axios.get('/api/examinations', { headers: authHeader(), params: { per_page: 200 } }),
       axios.get('/api/classes', { headers: authHeader(), params: { per_page: 200 } }),
+      axios.get('/api/grades', { headers: authHeader(), params: { per_page: 200 } }),
     ])
     examinations.value = examsRes.data.data || []
     classes.value = classesRes.data.data || []
+    grades.value = (gradesRes.data.data || []).sort((a: any, b: any) => Number(b.mark_from) - Number(a.mark_from))
   } catch (err) {
     console.error(err)
   } finally {
@@ -113,6 +116,25 @@ const gradeText = (grade: any | null) => {
   if (!grade) return '-'
   const gp = typeof grade.grade_point === 'number' ? grade.grade_point.toFixed(2) : String(grade.grade_point)
   return `${grade.grade} (${gp})`
+}
+
+const resolveGradeForMark = (markValue: any) => {
+  if (!grades.value.length) return null
+  if (markValue === '' || markValue === null || markValue === undefined) return null
+
+  const n = Number(markValue)
+  if (Number.isNaN(n)) return null
+  const mark = Math.trunc(n)
+
+  const g = grades.value.find((gr: any) => mark >= Number(gr.mark_from) && mark <= Number(gr.mark_upto))
+  if (!g) return null
+
+  return { grade: g.grade, grade_point: Number(g.grade_point) }
+}
+
+const gradeForRow = (row: any) => {
+  const resolved = resolveGradeForMark(row?.mark)
+  return resolved ?? row?.grade ?? null
 }
 
 const saveRow = async (row: any) => {
@@ -202,7 +224,11 @@ const saveRow = async (row: any) => {
 
       <div v-if="loadingRows" class="text-center text-gray-600">Loading...</div>
 
-      <div v-if="!loadingRows" class="overflow-x-auto">
+      <div v-if="!loadingRows && !context" class="text-center text-gray-600 py-10 bg-white rounded border border-gray-200">
+        Select exam, class and subject, then click <b>Filter</b> to load students.
+      </div>
+
+      <div v-if="!loadingRows && context" class="overflow-x-auto">
         <table class="w-full border-collapse border border-gray-200 bg-white rounded-md">
           <thead class="bg-blue-900 text-white">
             <tr>
@@ -219,7 +245,7 @@ const saveRow = async (row: any) => {
               <td class="border border-gray-200 px-4 py-2">
                 <input v-model="row.mark" type="number" min="0" max="100" class="input text-black" />
               </td>
-              <td class="border border-gray-200 px-4 py-2">{{ gradeText(row.grade) }}</td>
+              <td class="border border-gray-200 px-4 py-2">{{ gradeText(gradeForRow(row)) }}</td>
               <td class="border border-gray-200 px-4 py-2">
                 <input v-model="row.comment" placeholder="comment" class="input text-black" />
               </td>
@@ -235,7 +261,12 @@ const saveRow = async (row: any) => {
               </td>
             </tr>
             <tr v-if="rows.length === 0">
-              <td colspan="5" class="text-center py-6 text-gray-600">No students found</td>
+              <td colspan="5" class="text-center py-6 text-gray-600">
+                No students found for the selected class/section.
+                <span class="block text-xs mt-1">
+                  Tip: Try <b>All sections</b> or check the student's <b>Class/Section</b> in <b>Student Info</b>.
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -253,4 +284,3 @@ const saveRow = async (row: any) => {
   color: #000;
 }
 </style>
-

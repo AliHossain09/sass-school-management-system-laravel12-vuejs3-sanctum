@@ -1,4 +1,16 @@
-<script setup>
+<script setup lang="ts">
+interface LeaveNotification {
+  id: string
+  read_at: string | null
+  data: {
+    leave_request?: {
+      id: string
+      user_name?: string
+      leave_type_name?: string
+      start_date?: string
+    }
+  }
+}
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import HeadmasterSidebar from '../components/sidebar/HeadmasterSidebar.vue'
@@ -10,7 +22,7 @@ const isDropdownOpen = ref(false)
 const isNotificationOpen = ref(false)
 const selectedLanguage = ref('en')
 const router = useRouter()
-const leaveNotifications = ref([])
+const leaveNotifications = ref<LeaveNotification[]>([])
 
 // User info state
 const user = ref({
@@ -72,7 +84,7 @@ const toggleNotifications = async () => {
   }
 }
 
-const openLeaveFromNotification = async (notification) => {
+const openLeaveFromNotification = async (notification: LeaveNotification) => {
   try {
     if (!notification.read_at) {
       await axios.post(`/api/notifications/${notification.id}/read`, {}, { headers: authHeader() })

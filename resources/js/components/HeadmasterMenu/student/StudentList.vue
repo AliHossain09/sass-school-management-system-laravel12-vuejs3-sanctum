@@ -78,10 +78,19 @@ const loadClasses = async () => {
     }
 }
 
-const loadSections = async () => {
+const loadSectionsByClass = async (classId: any) => {
+    if (!classId) {
+        sections.value = []
+        form.value.section_id = ''
+        return
+    }
+
     try {
-        const res = await axios.get('/api/sections', { headers: authHeader() })
+        const res = await axios.get(`/api/sections/by-class/${classId}`, { headers: authHeader() })
         sections.value = res.data.data
+
+        const sectionStillValid = sections.value.some((s: any) => String(s.id) === String(form.value.section_id))
+        if (!sectionStillValid) form.value.section_id = ''
     } catch (err) {
         toast.error('Failed to load sections')
     }
@@ -116,9 +125,18 @@ const loadStudents = async (page = 1) => {
 onMounted(() => {
     loadStudents()
     loadClasses()
-    loadSections()
     loadElectiveSubjects()
 })
+
+watch(
+    () => form.value.class_id,
+    (v, oldV) => {
+        if (oldV && v !== oldV) {
+            form.value.section_id = ''
+        }
+        loadSectionsByClass(v)
+    }
+)
 
 /* --- Search debounce --- */
 watch(search, () => {
@@ -132,6 +150,7 @@ const openForm = () => {
     editingStudent.value = null
     photoPreview.value = null
     Object.keys(form.value).forEach(key => form.value[key] = key === 'photo' ? null : '')
+    sections.value = []
 }
 
 /* --- Photo change --- */
@@ -148,34 +167,63 @@ const onPhotoChange = (e: Event) => {
 /* --- Submit form --- */
 const submit = async () => {
     error.value = ''
-    if (!form.value.first_name || !form.value.last_name || !form.value.gender || !form.value.class_id) {
-        toast.error('First Name, Last Name, Gender, and Class are required.')
-        return
+    const requiredForCreate = [
+        { key: 'student_code', label: 'Student Code' },
+        { key: 'academic_year', label: 'Academic Year' },
+        { key: 'first_name', label: 'First Name' },
+        { key: 'last_name', label: 'Last Name' },
+        { key: 'dob', label: 'Date of Birth' },
+        { key: 'gender', label: 'Gender' },
+        { key: 'religion', label: 'Religion' },
+        { key: 'email', label: 'Email' },
+        { key: 'class_id', label: 'Class' },
+        { key: 'username', label: 'Username' },
+        { key: 'password', label: 'Password' },
+        { key: 'photo', label: 'Photo' },
+    ]
+
+    if (!editingStudent.value) {
+        const missing = requiredForCreate
+            .filter((f) => {
+                const v = form.value?.[f.key]
+                return v === null || v === undefined || v === ''
+            })
+            .map((f) => f.label)
+
+        if (missing.length) {
+            toast.error(`Required: ${missing.join(', ')}`)
+            return
+        }
     }
 
     const data = new FormData()
     Object.entries(form.value).forEach(([key, value]) => {
-        if (value !== null && value !== '') data.append(key, String(value))
+        if (value === null || value === '') return
+        const isFile =
+            (typeof File !== 'undefined' && value instanceof File) ||
+            (typeof Blob !== 'undefined' && value instanceof Blob)
+        data.append(key, isFile ? (value as any) : String(value))
     })
 
     try {
         loading.value = true
         if (editingStudent.value) {
             await axios.post(`/api/students/${editingStudent.value.id}`, data, {
-                headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' },
+                headers: { ...authHeader() },
                 params: { _method: 'PUT' }
             })
             toast.success('Student updated successfully!')
         } else {
             await axios.post('/api/students', data, {
-                headers: { ...authHeader(), 'Content-Type': 'multipart/form-data' }
+                headers: { ...authHeader() }
             })
             toast.success('Student created successfully!')
         }
         activeForm.value = false
         loadStudents(meta.value.current_page)
     } catch (err: any) {
-        toast.error(err.response?.data?.message || 'Failed to save student')
+        const firstError = err.response?.data?.errors ? Object.values(err.response.data.errors)[0]?.[0] : null
+        toast.error(firstError || err.response?.data?.message || 'Failed to save student')
     } finally {
         loading.value = false
     }
@@ -353,11 +401,17 @@ const deleteStudent = async (id: number) => {
                             </div>
                             <div class="flex flex-col">
                                 <label class="mb-1 font-medium text-gray-600">Class</label>
-                                <input v-model="form.class_id" class="input" />
+                                <select v-model="form.class_id" class="input">
+                                    <option value="">Select Class</option>
+                                    <option v-for="c in classes" :key="c.id" :value="c.id">{{ c.name }}</option>
+                                </select>
                             </div>
                             <div class="flex flex-col">
                                 <label class="mb-1 font-medium text-gray-600">Section</label>
-                                <input v-model="form.section_id" class="input" />
+                                <select v-model="form.section_id" class="input" :disabled="!form.class_id">
+                                    <option value="">Select Section</option>
+                                    <option v-for="s in sections" :key="s.id" :value="s.id">{{ s.name }}</option>
+                                </select>
                             </div>
                         </div>
 

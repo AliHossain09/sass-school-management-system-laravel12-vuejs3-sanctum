@@ -15,6 +15,14 @@ export default defineConfig({
     
     server: {
         // When running inside Docker, we bind to 0.0.0.0 but must expose a browser-reachable URL.
+        cors: {
+            origin: 'http://localhost:8000',
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            allowedHeaders: ['*'],
+        },
+        hmr: {
+            host: 'localhost',
+        },
         // Set VITE_DEV_SERVER_URL=http://localhost:5173 (via docker-compose) so Laravel's @vite uses it.
         origin: process.env.VITE_DEV_SERVER_URL,
         watch: {

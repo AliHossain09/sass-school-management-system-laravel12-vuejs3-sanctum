@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Student;
 
 use App\Http\Requests\ApiFormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreStudentRequest extends ApiFormRequest
 {
@@ -35,8 +36,16 @@ class StoreStudentRequest extends ApiFormRequest
             'present_address' => 'nullable|string',
             'permanent_address' => 'nullable|string',
 
-            'class_id' => 'required|exists:school_classes,id',
-            'section_id' => 'nullable|exists:sections,id',
+            'class_id' => [
+                'required',
+                Rule::exists('school_classes', 'id')->where('school_id', $this->user()?->school_id),
+            ],
+            'section_id' => [
+                'nullable',
+                Rule::exists('sections', 'id')
+                    ->where('school_id', $this->user()?->school_id)
+                    ->where('class_id', $this->input('class_id')),
+            ],
             'academic_year' => 'required|string',
             'shift' => 'nullable|string',
             'id_card_number' => 'nullable|string',
@@ -53,4 +62,3 @@ class StoreStudentRequest extends ApiFormRequest
         ];
     }
 }
-

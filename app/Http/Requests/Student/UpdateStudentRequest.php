@@ -16,6 +16,7 @@ class UpdateStudentRequest extends ApiFormRequest
     {
         $student = $this->route('student');
         $userId = $student?->user_id;
+        $classId = $this->input('class_id') ?? $student?->class_id;
 
         return [
             'first_name' => 'nullable|string',
@@ -44,8 +45,16 @@ class UpdateStudentRequest extends ApiFormRequest
             'present_address' => 'nullable|string',
             'permanent_address' => 'nullable|string',
 
-            'class_id' => 'nullable|exists:school_classes,id',
-            'section_id' => 'nullable|exists:sections,id',
+            'class_id' => [
+                'nullable',
+                Rule::exists('school_classes', 'id')->where('school_id', $this->user()?->school_id),
+            ],
+            'section_id' => [
+                'nullable',
+                Rule::exists('sections', 'id')
+                    ->where('school_id', $this->user()?->school_id)
+                    ->where('class_id', $classId),
+            ],
             'academic_year' => 'nullable|string',
             'shift' => 'nullable|string',
             'id_card_number' => 'nullable|string',
@@ -64,4 +73,3 @@ class UpdateStudentRequest extends ApiFormRequest
         ];
     }
 }
-

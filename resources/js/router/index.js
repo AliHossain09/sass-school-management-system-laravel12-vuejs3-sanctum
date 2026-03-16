@@ -43,6 +43,7 @@ import ExamMarks from '../components/HeadmasterMenu/examinations/ExamMarks.vue';
 import ExamPromotion from '../components/HeadmasterMenu/examinations/Promotion.vue';
 import SendExamMark from '../components/HeadmasterMenu/examinations/SendExamMark.vue';
 import ExamSchedules from '../components/HeadmasterMenu/examinations/ExamSchedules.vue';
+import ExamSeatPlan from '../components/HeadmasterMenu/examinations/SeatPlan.vue';
 
 
 //.................................Teacher Dashboard.......................................
@@ -125,6 +126,7 @@ const routes = [
   { path: '/examination-names', component: ExaminationNames, beforeEnter: requireAuth },
   { path: '/exam-grades', component: ExamGrades, beforeEnter: requireAuth },
   { path: '/exam-marks', component: ExamMarks, beforeEnter: requireAuth },
+  { path: '/exam-seat-plan', component: ExamSeatPlan, beforeEnter: requireAuth },
   { path: '/exam-schedules', component: ExamSchedules, beforeEnter: requireAuth },
   { path: '/exam-promotion', component: ExamPromotion, beforeEnter: requireAuth },
   { path: '/send-exam-mark', component: SendExamMark, beforeEnter: requireAuth },
