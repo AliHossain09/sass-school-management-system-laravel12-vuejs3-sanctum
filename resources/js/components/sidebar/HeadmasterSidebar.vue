@@ -201,6 +201,9 @@ const logout = () => {
         <router-link to="/send-exam-mark" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded" @click="$emit('close')"
           >Send exam mark</router-link
         >
+        <router-link to="/exam-result" class="text-sm hover:bg-indigo-600 px-3 py-2 rounded" @click="$emit('close')"
+          >Exam Result</router-link
+        >
       </div>
 
       <router-link to="/class-routine" class="px-3 py-2 rounded hover:bg-indigo-700 flex items-center gap-2" active-class="bg-indigo-600">

@@ -44,7 +44,8 @@ import ExamPromotion from '../components/HeadmasterMenu/examinations/Promotion.v
 import SendExamMark from '../components/HeadmasterMenu/examinations/SendExamMark.vue';
 import ExamSchedules from '../components/HeadmasterMenu/examinations/ExamSchedules.vue';
 import ExamSeatPlan from '../components/HeadmasterMenu/examinations/SeatPlan.vue';
-
+import ExamResult from '../components/HeadmasterMenu/examinations/ExamResult.vue';
+import AddExamResult from '../components/HeadmasterMenu/examinations/AddExamResult.vue';
 
 //.................................Teacher Dashboard.......................................
 import TeacherDashboard from '../Pages/dashboard/TeacherDashboard.vue';
@@ -130,6 +131,8 @@ const routes = [
   { path: '/exam-schedules', component: ExamSchedules, beforeEnter: requireAuth },
   { path: '/exam-promotion', component: ExamPromotion, beforeEnter: requireAuth },
   { path: '/send-exam-mark', component: SendExamMark, beforeEnter: requireAuth },
+  { path: '/exam-result', component: ExamResult, beforeEnter: requireAuth },
+  { path: '/exam-result/add', component: AddExamResult, beforeEnter: requireAuth },
   
   //.................................Teacher Dashboard........................................
   { path: '/teacher-dashboard', component: TeacherDashboard, beforeEnter: requireAuth },

@@ -174,5 +174,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/exam-schedules/{id}', [ExamScheduleController::class, 'update']);
         Route::delete('/exam-schedules/{id}', [ExamScheduleController::class, 'destroy']);
 
+        // Exam Results
+        Route::get('/exam-results', [App\Http\Controllers\ExamResultController::class, 'index']);
+        Route::post('/exam-results', [App\Http\Controllers\ExamResultController::class, 'store']);
+
     });
 });
